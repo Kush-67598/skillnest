@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Michroma } from "next/font/google";
+import { Michroma } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 
 import "./globals.css";
@@ -16,9 +16,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <>
-      <ToastContainer />
       <html lang="en">
-        <body className={`${michroma.className} bg-black `}>{children}</body>
+        <body className={`${michroma.className} bg-black `}>
+          <ToastContainer />
+          {children}
+        </body>
       </html>
     </>
   );
