@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+
+
+*{
+  border: none;
+}
+
+#Featured{
+  border: 2px solid ;
+
+}
+
+
+
+html {
+  scroll-behavior: smooth;
+}   
