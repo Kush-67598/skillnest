@@ -121,7 +121,7 @@ export default function ProfilePage({ user }) {
 
             <div className="flex justify-around mt-6">
               <div>
-                <p className="text-sm font-semibold">12</p>
+                <p className="text-sm font-semibold">100,000</p>
                 <p className="text-xs text-gray-500">Followers</p>
               </div>
               <div>

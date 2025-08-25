@@ -138,10 +138,10 @@ export default function CreatorDashboard({ searchParams }) {
   };
 
   useEffect(() => {
-    if (token) {
+    if (token && courseId) {
       fetchOne(courseId);
     }
-  }, [token]);
+  }, [token, courseId]);
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedToken = localStorage.getItem("Token");
@@ -387,7 +387,7 @@ export default function CreatorDashboard({ searchParams }) {
       {loading && <Loader />}
       <ToastContainer />
 
-      <div className=" h-[100dvh] bg-gray-800 p-6 shadow space-y-4">
+      <div className=" bg-gray-800 p-6 shadow space-y-4">
         <div className=" flex items-center justify-between">
           <h2 className="text-3xl font-semibold text-center  py-2">
             Add New Course
@@ -407,7 +407,7 @@ export default function CreatorDashboard({ searchParams }) {
               onChange={handleChange_course}
               name={item.name}
               value={item.value}
-              type={item.name === "Price" ? "number" : "text"}
+              type={item.name === "price" ? "number" : "text"}
               placeholder={item.name}
               className="w-full p-3 rounded-md bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
