@@ -11,16 +11,6 @@ export default function OrderPage({ params }) {
     if (!token) return; // wait for token
     FetchSingleCourse();
   }, [token]);
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("USER_TOKEN");
@@ -77,7 +67,7 @@ export default function OrderPage({ params }) {
         fetch(`${process.env.NEXT_PUBLIC_API}/api/payments`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({response:response,email}),
+          body: JSON.stringify({ response: response, email }),
         });
       },
       prefill: {
@@ -99,9 +89,10 @@ export default function OrderPage({ params }) {
 
   return (
     <>
-      <Head>
-        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-      </Head>
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="afterInteractive"
+      />
       <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
         <div className="w-full max-w-2xl bg-gray-800 rounded-xl shadow-lg p-6 space-y-6">
           {Course && (
