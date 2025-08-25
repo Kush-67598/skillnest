@@ -5,6 +5,7 @@ import "./globals.css";
 
 const michroma = Michroma({
   variable: "--font-Michroma",
+  subsets: ["latin"], // always good to specify
   weight: "400",
 });
 
