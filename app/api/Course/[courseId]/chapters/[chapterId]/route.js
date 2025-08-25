@@ -21,9 +21,6 @@ export async function DELETE(request, { params }) {
   return Response.json({ success: true, deletedChapter: chapterToDelete });
 }
 
-import { ConnectDB } from "@/Hooks/useConnectDB";
-import Courses from "@/Models/Courses";
-
 export async function GET(request, { params }) {
   await ConnectDB();
   const { courseId, chapterId } = params;
