@@ -76,6 +76,36 @@ export default function CreatorDashboard({ searchParams }) {
     setSingleCourse([response.reqCourse]);
   };
 
+  const UploadThumbnail = async () => {
+    const sigRes = await fetch(
+      `${process.env.NEXT_PUBLIC_API}/api/handle_uploads`,
+      { method: "POST" }
+    );
+    const { signature, timestamp, apiKey, folder } = await sigRes.json();
+    if (!file) {
+      alert("PLEASE UPLOAD THE FILE");
+    }
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("api_key", apiKey);
+      formData.append("timestamp", timestamp);
+      formData.append("signature", signature);
+      formData.append("folder", folder);
+      formData.append("keep_original", "false"); // very important
+      setLoading(true);
+
+      const fetchData = await fetch(
+        `https://api.cloudinary.com/v1_1/dt95b41ai/image/upload`,
+        { method: "POST", body: formData }
+      );
+      const res = await fetchData.json();
+      setFormData((prev) => ({ ...prev, thumbnailurl: res.secure_url }));
+
+      setLoading(false);
+      toast.success("Video Uploaded Successfully", { autoClose: 1000 });
+    }
+  };
   const handleUpload = async () => {
     const sigRes = await fetch(
       `${process.env.NEXT_PUBLIC_API}/api/handle_uploads`,
@@ -393,7 +423,7 @@ export default function CreatorDashboard({ searchParams }) {
             Add New Course
           </h2>
           <h2
-            className="text-xl font-semibold text-center  hover:text-blue-400 hover:underline  cursor-pointer  py-2"
+            className="text-xl font-semibold text-center  hover:text-blue-400 hover:underline  cursor-pointer 0 py-2"
             onClick={() => router.push("/Creator/panel/View")}
           >
             View All Courses
@@ -409,9 +439,18 @@ export default function CreatorDashboard({ searchParams }) {
               value={item.value}
               type={item.name === "price" ? "number" : "text"}
               placeholder={item.name}
-              className="w-full p-3 rounded-md bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className={`w-full p-3 rounded-md ${
+                item.name == "thumbnailurl" ? "hidden" : "block"
+              } bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500`}
             />
           ))}
+          <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+          <button
+            className="bg-purple-500 p-2 mx-2 rounded-md"
+            onClick={() => UploadThumbnail()}
+          >
+            UPLOAD THUMBNAIL
+          </button>
         </div>
         <button
           onClick={handle_Course_Submit}

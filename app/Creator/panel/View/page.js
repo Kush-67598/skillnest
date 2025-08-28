@@ -22,12 +22,15 @@ export default function CreatorMyCourses() {
   }, [token]);
 
   const FetchCreatorCourses = async () => {
-    const fetchCourse = await fetch(`${process.env.NEXT_PUBLIC_API}/api/CreatorCourse`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const fetchCourse = await fetch(
+      `${process.env.NEXT_PUBLIC_API}/api/CreatorCourse`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     const response = await fetchCourse.json();
     setAllCourses(response.Creator_courses);
   };
@@ -46,7 +49,7 @@ export default function CreatorMyCourses() {
             >
               <div className="w-full h-40 text-white overflow-hidden rounded-md">
                 <img
-                  src={course.thumbnailURL}
+                  src={course.thumbnailURL || " "}
                   alt={course.title}
                   className="w-full h-full object-cover"
                 />
