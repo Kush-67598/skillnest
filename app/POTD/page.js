@@ -66,17 +66,17 @@ export default function Test() {
                     key={idx}
                     className="p-5 rounded-xl bg-gray-700 max-h-full hover:bg-gray-600 transition cursor-pointer shadow-md"
                   >
-                    <div className="flex items-start justify-between">
+                    <div className="flex flex-col items-start justify-between">
                       {/* Question Text */}
-                      <p className="text-lg text-gray-200 font-semibold leading-snug max-w-[80%]">
-                        {item.Question}
-                      </p>
-                      {/* Difficulty Badge */}
                       <span
-                        className={`ml-4 px-3 py-1 rounded-full text-xs font-bold ${difficultyColor}`}
+                        className={` px-3 py-2 my-3 rounded-full text-xs font-bold ${difficultyColor}`}
                       >
                         {item.Difficulty}
                       </span>
+                      <p className="text-md text-gray-200 font-semibold leading-snug max-w-[80%]">
+                        {item.Question}
+                      </p>
+                      {/* Difficulty Badge */}
                     </div>
                   </li>
                 );
