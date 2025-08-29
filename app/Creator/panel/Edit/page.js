@@ -2,10 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import Loader from "@/Components/Loader/loader";
+import Uploader from "@/Components/Loader/UploadLoader";
+
 import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function CreatorDashboard({ searchParams }) {
+  const [uploading, setUploading] = useState(false);
   const unwrapped = React.use(searchParams);
   const courseId = unwrapped.courseId;
   const router = useRouter();
@@ -64,12 +67,7 @@ export default function CreatorDashboard({ searchParams }) {
   const fetchOne = async (courseId) => {
     if (!courseId) return;
     const fetch_one_course = await fetch(
-      `${process.env.NEXT_PUBLIC_API}/api/Course/${courseId}`,
-      {
-        // headers: {
-        //   Authorization: `Bearer ${token}`,
-        // },
-      }
+      `${process.env.NEXT_PUBLIC_API}/api/Course/${courseId}`
     );
     const response = await fetch_one_course.json();
 
@@ -103,7 +101,10 @@ export default function CreatorDashboard({ searchParams }) {
       setFormData((prev) => ({ ...prev, thumbnailurl: res.secure_url }));
 
       setLoading(false);
-      toast.success("Video Uploaded Successfully", { autoClose: 1000 });
+      toast.success("Video Uploaded Successfully", {
+        autoClose: 1000,
+        pauseOnHover: false,
+      });
     }
   };
   const handleUpload = async () => {
@@ -124,15 +125,21 @@ export default function CreatorDashboard({ searchParams }) {
       formData.append("folder", folder);
       formData.append("keep_original", "false"); // very important
       setLoading(true);
+      setUploading(true);
 
       const fetchData = await fetch(
         `https://api.cloudinary.com/v1_1/dt95b41ai/video/upload`,
         { method: "POST", body: formData }
       );
+      setUploading(false);
+
       const res = await fetchData.json();
       setLessonsData((prev) => ({ ...prev, videoURL: res.secure_url }));
       setLoading(false);
-      toast.success("Video Uploaded Successfully", { autoClose: 1000 });
+      toast.success("Video Uploaded Successfully", {
+        autoClose: 1000,
+        pauseOnHover: false,
+      });
     }
   };
   const handleImageUpload = async () => {
@@ -153,18 +160,26 @@ export default function CreatorDashboard({ searchParams }) {
       formData.append("signature", signature);
       formData.append("folder", folder);
       formData.append("keep_original", "false"); // very important
-      setLoading(true);
+      setUploading(true);
 
       const fetchData = await fetch(
         `https://api.cloudinary.com/v1_1/dt95b41ai/image/upload`,
         { method: "POST", body: formData }
       );
+      setUploading(false);
+
       const res = await fetchData.json();
       uploadedImages.push(res.secure_url);
     }
-    setSectionData((prev) => [...prev, { images: uploadedImages }]);
-    setLoading(false);
-    toast.success("Images Uploaded Successfully", { autoClose: 1000 });
+    setSectionData((prev) => {
+      const updated = [...prev];
+      updated[prev.length - 1].images.push(...uploadedImages);
+      return updated;
+    });
+    toast.success("Images Uploaded Successfully", {
+      autoClose: 1000,
+      pauseOnHover: false,
+    });
   };
 
   useEffect(() => {
@@ -225,6 +240,7 @@ export default function CreatorDashboard({ searchParams }) {
 
   const ADD_SUB_CH = async (courseId, chapter_id) => {
     try {
+      setLoading(true);
       const addChapter = await fetch(
         `${process.env.NEXT_PUBLIC_API}/api/Course/${courseId}/chapters/${chapter_id}/subchapters`,
         {
@@ -233,9 +249,14 @@ export default function CreatorDashboard({ searchParams }) {
           body: JSON.stringify(subChapterdata),
         }
       );
+      setLoading(false);
+
       const res = await addChapter.json();
       if (res.success) {
-        toast.success("SubChapter Added Successfully", { autoClose: 1000 });
+        toast.success("SubChapter Added Successfully", {
+          autoClose: 1000,
+          pauseOnHover: false,
+        });
         fetchOne(courseId);
         setSubChapterData({
           title: "",
@@ -243,11 +264,18 @@ export default function CreatorDashboard({ searchParams }) {
         });
       }
     } catch (error) {
-      toast.error("Internal Server Error!! SubChapter Can't be Added");
+      toast.error("Internal Server Error!! SubChapter Can't be Added", {
+        autoClose: 1000,
+        pauseOnHover: false,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   const ADD_CH = async (courseId) => {
+    setLoading(true);
+
     try {
       const addChapter = await fetch(
         `${process.env.NEXT_PUBLIC_API}/api/Course/${courseId}/chapters`,
@@ -257,18 +285,30 @@ export default function CreatorDashboard({ searchParams }) {
           body: JSON.stringify(chapterdata),
         }
       );
+      setLoading(false);
+
       const res = await addChapter.json();
       if (res.success) {
-        toast.success("Chapter Added Successfully", { autoClose: 1000 });
+        toast.success("Chapter Added Successfully", {
+          autoClose: 1000,
+          pauseOnHover: false,
+        });
         setChapterData({ title: "", order: "" });
         fetchOne(courseId);
       }
     } catch (error) {
-      toast.error("Internal Server Error!! Chapter Can't be Added");
+      toast.error("Internal Server Error!! Chapter Can't be Added", {
+        autoClose: 1000,
+        pauseOnHover: false,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   const ADD_LESSON = async (courseId, chapter_id, subchapterId) => {
+    setLoading(true);
+
     try {
       const addLesson = await fetch(
         `${process.env.NEXT_PUBLIC_API}/api/Course/${courseId}/chapters/${chapter_id}/subchapters/${subchapterId}/lessons`,
@@ -278,13 +318,23 @@ export default function CreatorDashboard({ searchParams }) {
           body: JSON.stringify({ lessonsdata, sectionData }),
         }
       );
+      setLoading(false);
+
       const res = await addLesson.json();
       if (res.success) {
-        toast.success("Lesson Added Successfully", { autoClose: 1000 });
+        toast.success("Lesson Added Successfully", {
+          autoClose: 1000,
+          pauseOnHover: false,
+        });
         fetchOne(courseId);
       }
     } catch (error) {
-      toast.error("Internal Server Error!! Lesson Can't be Added");
+      toast.error("Internal Server Error!! Lesson Can't be Added", {
+        autoClose: 1000,
+        pauseOnHover: false,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -302,6 +352,8 @@ export default function CreatorDashboard({ searchParams }) {
   }));
 
   const handle_Course_Submit = async () => {
+    setLoading(true);
+
     try {
       const addCourse = await fetch(
         `${process.env.NEXT_PUBLIC_API}/api/Course`,
@@ -314,9 +366,14 @@ export default function CreatorDashboard({ searchParams }) {
           method: "POST",
         }
       );
+      setLoading(false);
+
       const response = await addCourse.json();
       if (response.success) {
-        toast.success("Course Added Successfully", { autoClose: 1000 });
+        toast.success("Course Added Successfully", {
+          autoClose: 1000,
+          pauseOnHover: false,
+        });
         setFormData({
           slug: "",
           title: "",
@@ -328,10 +385,17 @@ export default function CreatorDashboard({ searchParams }) {
         fetchOne(courseId);
       }
     } catch (error) {
-      toast.error("Internal Server Error!! Course Can't be Added");
+      toast.error("Internal Server Error!! Course Can't be Added", {
+        autoClose: 1000,
+        pauseOnHover: false,
+      });
+    } finally {
+      setLoading(false);
     }
   };
   const delete_Course = async (courseId) => {
+    setLoading(true);
+
     try {
       const deleteCourse = await fetch(
         `${process.env.NEXT_PUBLIC_API}/api/Course/${courseId}`,
@@ -342,16 +406,28 @@ export default function CreatorDashboard({ searchParams }) {
           method: "DELETE",
         }
       );
+      setLoading(false);
+
       const response = await deleteCourse.json();
       if (response.success) {
-        toast.success("Course Deleted Successfully", { autoClose: 1000 });
+        toast.success("Course Deleted Successfully", {
+          autoClose: 1000,
+          pauseOnHover: false,
+        });
         fetchOne(courseId);
       }
     } catch (error) {
-      toast.error("Internal Server Error!! Course Can't be Deleted");
+      toast.error("Internal Server Error!! Course Can't be Deleted", {
+        autoClose: 1000,
+        pauseOnHover: false,
+      });
+    } finally {
+      setLoading(false);
     }
   };
   const delete_chapter = async (courseId, chapterId) => {
+    setLoading(true);
+
     try {
       const deleteChapter = await fetch(
         `${process.env.NEXT_PUBLIC_API}/api/Course/${courseId}/chapters/${chapterId}`,
@@ -362,16 +438,28 @@ export default function CreatorDashboard({ searchParams }) {
           method: "DELETE",
         }
       );
+      setLoading(false);
+
       const response = await deleteChapter.json();
       if (response.success) {
-        toast.success("Chapter Deleted Successfully", { autoClose: 1000 });
+        toast.success("Chapter Deleted Successfully", {
+          autoClose: 1000,
+          pauseOnHover: false,
+        });
         fetchOne(courseId);
       }
     } catch (error) {
-      toast.error("Internal Server Error!! Chapter Can't be Deleted");
+      toast.error("Internal Server Error!! Chapter Can't be Deleted", {
+        autoClose: 1000,
+        pauseOnHover: false,
+      });
+    } finally {
+      setLoading(false);
     }
   };
   const delete_subChapter = async (courseId, chapterId, subchapterId) => {
+    setLoading(true);
+
     try {
       const deleteSubchapter = await fetch(
         `${process.env.NEXT_PUBLIC_API}/api/Course/${courseId}/chapters/${chapterId}/subchapters/${subchapterId}`,
@@ -382,16 +470,28 @@ export default function CreatorDashboard({ searchParams }) {
           method: "DELETE",
         }
       );
+      setLoading(false);
+
       const response = await deleteSubchapter.json();
       if (response.success) {
-        toast.success("Subchapter Deleted Successfully", { autoClose: 1000 });
+        toast.success("Subchapter Deleted Successfully", {
+          autoClose: 1000,
+          pauseOnHover: false,
+        });
         fetchOne(courseId);
       }
     } catch (error) {
-      toast.error("Internal Server Error!! Subchapter Can't be Deleted");
+      toast.error("Internal Server Error!! Subchapter Can't be Deleted", {
+        autoClose: 1000,
+        pauseOnHover: false,
+      });
+    } finally {
+      setLoading(false);
     }
   };
   const delete_lesson = async (courseId, chapterId, subchapterId, lessonId) => {
+    setLoading(true);
+
     try {
       const deletelesson = await fetch(
         `${process.env.NEXT_PUBLIC_API}/api/Course/${courseId}/chapters/${chapterId}/subchapters/${subchapterId}/lessons/${lessonId}`,
@@ -402,18 +502,29 @@ export default function CreatorDashboard({ searchParams }) {
           method: "DELETE",
         }
       );
+      setLoading(false);
+
       const response = await deletelesson.json();
       if (response.success) {
-        toast.success("Lesson Deleted Successfully", { autoClose: 1000 });
+        toast.success("Lesson Deleted Successfully", {
+          autoClose: 1000,
+          pauseOnHover: false,
+        });
         fetchOne(courseId);
       }
     } catch (error) {
-      toast.error("Internal Server Error!! Lesson Can't be Deleted");
+      toast.error("Internal Server Error!! Lesson Can't be Deleted", {
+        autoClose: 1000,
+        pauseOnHover: false,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="text-white ">
+      {uploading && <Uploader />}
       {loading && <Loader />}
       <ToastContainer />
 
@@ -446,15 +557,23 @@ export default function CreatorDashboard({ searchParams }) {
           ))}
           <input type="file" onChange={(e) => setFile(e.target.files[0])} />
           <button
-            className="bg-purple-500 p-2 mx-2 rounded-md"
+            className="bg-purple-500 p-3 mt-3 mx-2 rounded-md"
             onClick={() => UploadThumbnail()}
           >
-            UPLOAD THUMBNAIL
+            Upload Thumbnail
           </button>
         </div>
+
         <button
+          disabled={
+            !formdata.category ||
+            !formdata.description ||
+            formdata.price == "" ||
+            !formdata.slug ||
+            !formdata.title
+          }
           onClick={handle_Course_Submit}
-          className="bg-green-600 px-5 py-3 rounded-md hover:bg-green-700 text-sm transition"
+          className={`disabled:bg-green-400 disabled:opacity-60 opacity-100 bg-green-600 px-5 py-3 rounded-md hover:bg-green-700 text-sm transition`}
         >
           Add Course
         </button>
@@ -503,8 +622,9 @@ export default function CreatorDashboard({ searchParams }) {
                   className="w-full p-2 rounded-md bg-gray-600 placeholder-gray-400 focus:outline-none"
                 />
                 <button
+                  disabled={chapterdata.title == "" || chapterdata.order == ""}
                   onClick={() => ADD_CH(course._id)}
-                  className=" text-sm bg-green-600 px-4 py-2 rounded-md hover:bg-green-700 transition"
+                  className=" disabled:bg-green-400 disabled:opacity-60 opacity-100 text-sm bg-green-600 px-4 py-2 rounded-md hover:bg-green-700 transition"
                 >
                   Add Chapter
                 </button>
@@ -566,8 +686,12 @@ export default function CreatorDashboard({ searchParams }) {
                               className="w-full p-2 my-1 rounded-md bg-gray-600 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-lime-300"
                             />
                             <button
+                              disabled={
+                                subChapterdata.title == "" ||
+                                subChapterdata.order == ""
+                              }
                               onClick={() => ADD_SUB_CH(course._id, ch._id)}
-                              className="bg-green-600 px-4 py-2 rounded-md hover:bg-green-700 transition text-sm"
+                              className="disabled:bg-green-400 disabled:opacity-60 opacity-100 bg-green-600 px-4 py-2 rounded-md hover:bg-green-700 transition text-sm"
                             >
                               Add Subchapter
                             </button>
@@ -736,10 +860,15 @@ export default function CreatorDashboard({ searchParams }) {
                                     </div>
 
                                     <button
+                                      disabled={
+                                        lessonsdata.order == "" ||
+                                        lessonsdata.title == "" ||
+                                        !sectionData
+                                      }
                                       onClick={() =>
                                         ADD_LESSON(course._id, ch._id, item._id)
                                       }
-                                      className="bg-green-600 px-4 py-2 rounded-md hover:bg-green-700 transition text-sm"
+                                      className="disabled:bg-green-400 disabled:opacity-60 opacity-100 bg-green-600 px-4 py-2 rounded-md hover:bg-green-700 transition text-sm"
                                     >
                                       Add Lesson
                                     </button>

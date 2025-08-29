@@ -82,29 +82,45 @@ export default function SingleCourseCard({ course }) {
         </span>
       </div>
 
-      {/* Chapters / Hierarchical Data */}
-      {course.chapters && course.chapters.length > 0 && (
-        <div className="mb-10">
-          <h2 className="text-2xl font-semibold text-white mb-4 flex items-center gap-2">
-            📘 Chapters
-          </h2>
-          <ul className="space-y-3">
-            {course.chapters.map((chapter, idx) => (
-              <li
-                key={chapter._id}
-                className="p-4 bg-gray-800/70 rounded-xl border border-gray-700 hover:bg-gray-700/80 transition flex items-center justify-between shadow-md"
-              >
-                <span className="text-gray-200 font-medium text-lg">
-                  {idx + 1}. {chapter.title}
-                </span>
-                <span className="text-indigo-400 text-sm">
-                  {chapter.lessons?.length || 0} lessons
-                </span>
-              </li>
-            ))}
-          </ul>
+      {/* Details Container */}
+      <div className="mb-8 bg-gray-800 p-5 rounded-2xl border border-gray-700 shadow-md hover:shadow-lg transition-shadow">
+        <h3 className="text-xl font-bold text-white mb-4">📚 Course Details</h3>
+
+        <div className="flex flex-col sm:flex-row justify-between gap-4">
+          {/* Chapters */}
+          <div className="flex items-center gap-2 bg-gray-700 p-3 rounded-xl flex-1 hover:bg-gray-600 transition">
+            <span className="text-purple-400 text-2xl">📘</span>
+            <div>
+              <p className="text-gray-300 text-sm">Chapters</p>
+              <p className="text-white font-semibold text-lg">
+                {Count_chapter}
+              </p>
+            </div>
+          </div>
+
+          {/* Subchapters */}
+          <div className="flex items-center gap-2 bg-gray-700 p-3 rounded-xl flex-1 hover:bg-gray-600 transition">
+            <span className="text-indigo-400 text-2xl">📄</span>
+            <div>
+              <p className="text-gray-300 text-sm">Subchapters</p>
+              <p className="text-white font-semibold text-lg">
+                {countSubchapters}
+              </p>
+            </div>
+          </div>
+
+          {/* Lessons */}
+          <div className="flex items-center gap-2 bg-gray-700 p-3 rounded-xl flex-1 hover:bg-gray-600 transition">
+            <span className="text-green-400 text-2xl">🎬</span>
+            <div>
+              <p className="text-gray-300 text-sm">Lessons</p>
+              <p className="text-white font-semibold text-lg">{countLessons}</p>
+            </div>
+          </div>
         </div>
-      )}
+      </div>
+
+      {/* Chapters / Hierarchical Data */}
 
       {/* Buttons */}
       <div className="flex gap-6 mt-6">
@@ -132,9 +148,7 @@ export default function SingleCourseCard({ course }) {
       </div>
 
       {/* Comments Section */}
-      <div className="mt-12 border-t border-gray-700 pt-8">
-        <CommentsPage course={course} />
-      </div>
+      <CommentsPage course={course} />
     </div>
   );
 }

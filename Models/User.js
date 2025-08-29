@@ -9,6 +9,14 @@ const UserSchema = new mongoose.Schema({
       return !this.googleId;
     },
   },
+  POTD: [
+    {
+      Question: { type: String, default: "" },
+      Answer: { type: String, default: "" },
+      Difficulty: { type: String, default: "" },
+    },
+  ],
+
   profileImg: { type: String },
   bio: { type: String },
   courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],

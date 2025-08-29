@@ -3,7 +3,6 @@
 import { ConnectDB } from "@/Hooks/useConnectDB";
 import Courses from "@/Models/Courses";
 
-
 export async function GET({ params }) {
   await ConnectDB();
   const { courseId, chapterId, subchapterId } = params;
@@ -30,8 +29,7 @@ export async function GET({ params }) {
   return Response.json({ getSubchapter });
 }
 
-
-export async function DELETE(request,{ params }) {
+export async function DELETE(request, { params }) {
   await ConnectDB();
   const { courseId, chapterId, subchapterId } = params;
   const getCourse = await Courses.findById(courseId);
@@ -39,7 +37,7 @@ export async function DELETE(request,{ params }) {
   const getSubchapter = getchapter.subChapters.id(subchapterId);
   const subchapter_to_delete = getSubchapter.deleteOne();
   await getCourse.save();
-  return Response.json({ success:true,subchapter_to_delete });
+  return Response.json({ success: true, subchapter_to_delete });
 }
 
 export async function PUT(request, { params }) {
@@ -51,10 +49,9 @@ export async function PUT(request, { params }) {
   const getchapter = getCourse.chapters.id(chapterId);
   const getSubchapter = getchapter.subChapters.id(subchapterId);
 
-if (title !== undefined) getSubchapter.title = title;
-if (order !== undefined) getSubchapter.order = order;
-
-
+  if (title !== undefined) getSubchapter.title = title;
+  if (order !== undefined) getSubchapter.order = order;
 
   await getCourse.save();
+  return Response.json({ updatedSubchapter: getCourse });
 }

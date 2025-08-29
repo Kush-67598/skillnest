@@ -1,9 +1,10 @@
-import { ThreeDots } from "react-loader-spinner";
+import {  Bars } from "react-loader-spinner";
 
 export default function Loader({ message }) {
   return (
-    <div className="flex flex-col items-center justify-center p-4">
-      <ThreeDots
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-black/50 z-50">
+      {" "}
+      <Bars
         visible={true}
         height="80"
         width="80"
@@ -13,6 +14,7 @@ export default function Loader({ message }) {
         wrapperStyle={{}}
         wrapperClass=""
       />
+      
       {message && <p className="mt-2 text-sm text-gray-600">{message}</p>}
     </div>
   );

@@ -1,14 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { ToastContainer, toast } from "react-toastify";
 import { useState, useRef } from "react";
+
+import { ToastContainer, toast } from "react-toastify";
+
 import {
+  FaBook,
   FaBookmark,
   FaCog,
   FaComment,
-  FaDownload,
-  FaHeart,
   FaInfoCircle,
   FaShieldAlt,
   FaSignOutAlt,
@@ -17,6 +18,39 @@ import {
 import { useRouter } from "next/navigation";
 
 export default function ProfilePage({ user }) {
+  const [POTDData, setPOTDData] = useState({
+    Question: "",
+    Answer: "",
+    Difficulty: "",
+  });
+  console.log("POTDData", POTDData);
+  const POTDGROQ = async () => {
+    const response = await fetch("/api/Groq/POTDQuestion", {
+      method: "POST",
+    });
+    const res = await response.json();
+    console.log(res.data.Question);
+
+    const newData = {
+      Question: res.data.Question,
+      Answer: res.data.Answer,
+      Difficulty: res.data.Difficulty,
+    };
+    setPOTDData(newData);
+    await savePOTDToDb(newData);
+  };
+  const savePOTDToDb = async (newData) => {
+    const res = await fetch("/api/POTD", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("USER_TOKEN")}`,
+      },
+      method: "POST",
+      body: JSON.stringify(newData),
+    });
+    const finalRes = await res.json();
+    console.log(finalRes);
+  };
+
   const [file, setFile] = useState(null);
   const [image, setImage] = useState(user?.profileImg || null);
   const [loading, setLoading] = useState(false);
@@ -140,7 +174,15 @@ export default function ProfilePage({ user }) {
             <h3 className="text-sm font-semibold text-gray-700 border-b pb-2">
               Activities
             </h3>
-            <div className="grid grid-cols-2 gap-3 text-center">
+            <div className="grid grid-cols-1 gap-3 text-center">
+              <p
+                onClick={async () => {
+                  POTDGROQ();
+                }}
+                className="bg-green-600 text-white hover:cursor-pointer mx-54 rounded-xl p-3"
+              >
+                Get Your POTD for Today
+              </p>
               <div className="bg-gray-50 rounded-lg p-2">
                 <p className="text-xs text-gray-500">POTD Streak</p>
                 <p className="text-sm font-semibold">--</p>
@@ -169,16 +211,6 @@ export default function ProfilePage({ user }) {
               Content
             </h3>
             <div className="space-y-2">
-              <div onClick={()=>router.push('/EditProfile')} className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-md px-3 py-2 cursor-pointer">
-                <div className="flex items-center gap-2 text-gray-700 text-sm">
-                  <span className="text-green-600">
-                    <FaUserEdit />
-                  </span>
-                  Edit Profile
-                </div>
-                <span className="text-gray-400">›</span>
-              </div>
-
               <div
                 onClick={() => router.push("/Bookmarks")}
                 className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-md px-3 py-2 cursor-pointer"
@@ -191,26 +223,15 @@ export default function ProfilePage({ user }) {
                 </div>
                 <span className="text-gray-400">›</span>
               </div>
-
-              <div className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-md px-3 py-2 cursor-pointer">
-                <div
-                  onClick={() => router.push("/Interest")}
-                  className="flex items-center gap-2 text-gray-700 text-sm"
-                >
-                  <span className="text-green-600">
-                    <FaHeart />
-                  </span>
-                  Interests
-                </div>
-                <span className="text-gray-400">›</span>
-              </div>
-
-              <div className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-md px-3 py-2 cursor-pointer">
+              <div
+                onClick={() => router.push("/MyCourses")}
+                className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-md px-3 py-2 cursor-pointer"
+              >
                 <div className="flex items-center gap-2 text-gray-700 text-sm">
                   <span className="text-green-600">
-                    <FaDownload />
+                    <FaBook />{" "}
                   </span>
-                  Downloads
+                  My Courses
                 </div>
                 <span className="text-gray-400">›</span>
               </div>
@@ -224,7 +245,10 @@ export default function ProfilePage({ user }) {
             </h3>
             <div className="space-y-2">
               <a>
-                <div className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-md px-3 py-2 cursor-pointer">
+                <div
+                  onClick={() => router.push("/Settings")}
+                  className="flex my-2 items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-md px-3 py-2 cursor-pointer"
+                >
                   <div className="flex items-center gap-2 text-gray-700 text-sm">
                     <span className="text-green-600">
                       <FaCog />
@@ -235,11 +259,11 @@ export default function ProfilePage({ user }) {
                 </div>
               </a>
 
-              <div className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-md px-3 py-2 cursor-pointer">
-                <div
-                  onClick={() => router.push("/About")}
-                  className="flex items-center gap-2 text-gray-700 text-sm"
-                >
+              <div
+                onClick={() => router.push("/About")}
+                className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-md px-3 py-2 cursor-pointer"
+              >
+                <div className="flex items-center gap-2 text-gray-700 text-sm">
                   <span className="text-green-600">
                     <FaInfoCircle />
                   </span>
@@ -248,11 +272,11 @@ export default function ProfilePage({ user }) {
                 <span className="text-gray-400">›</span>
               </div>
 
-              <div className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-md px-3 py-2 cursor-pointer">
-                <div
-                  onClick={() => router.push("/Legal")}
-                  className="flex items-center gap-2 text-gray-700 text-sm"
-                >
+              <div
+                onClick={() => router.push("/Legal")}
+                className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-md px-3 py-2 cursor-pointer"
+              >
+                <div className="flex items-center gap-2 text-gray-700 text-sm">
                   <span className="text-green-600">
                     <FaShieldAlt />
                   </span>
@@ -261,11 +285,11 @@ export default function ProfilePage({ user }) {
                 <span className="text-gray-400">›</span>
               </div>
 
-              <div className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-md px-3 py-2 cursor-pointer">
-                <div
-                  onClick={() => router.push("/Feedback")}
-                  className="flex items-center gap-2 text-gray-700 text-sm"
-                >
+              <div
+                onClick={() => router.push("/Feedback")}
+                className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-md px-3 py-2 cursor-pointer"
+              >
+                <div className="flex items-center gap-2 text-gray-700 text-sm">
                   <span className="text-green-600">
                     <FaComment />
                   </span>

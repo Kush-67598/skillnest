@@ -1,6 +1,6 @@
 export default function LegalPage() {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 space-y-10 bg-gray-900 min-h-screen text-gray-200">
+    <div className="max-w-full mx-auto px-4 py-12 space-y-10 bg-gray-900 min-h-screen text-gray-200">
       <h1 className="text-4xl font-bold text-center text-white mb-8">
         Legal & Policies
       </h1>

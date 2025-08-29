@@ -12,11 +12,12 @@ export async function GET(req) {
   }
 
   return Response.json({
-    username:u.username,
+    username: u.username,
     bio: u.bio,
     name: u.name,
     email: u.email,
     profileImg: u.profileImg || "",
+    POTD: u.POTD,
     success: true,
   });
 }

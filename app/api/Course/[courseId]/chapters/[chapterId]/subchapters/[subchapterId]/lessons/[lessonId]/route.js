@@ -1,11 +1,11 @@
 import { ConnectDB } from "@/Hooks/useConnectDB";
 import Courses from "@/Models/Courses";
 
-
 export async function PUT(request, { params }) {
   await ConnectDB();
   const { courseId, chapterId, subchapterId, lessonId } = params;
-  const { title, order, content, videoURL } = await request.json();
+  const body = await request.json();
+  const { form, sectionData } = body;
 
   const getCourse = await Courses.findById(courseId);
   if (!getCourse)
@@ -23,14 +23,24 @@ export async function PUT(request, { params }) {
   if (!lesson_to_update)
     return Response.json({ error: "Lesson not found" }, { status: 404 });
 
-  if (title !== undefined) lesson_to_update.title = title;
-  if (order !== undefined) lesson_to_update.order = order;
-  if (content !== undefined) lesson_to_update.content = content;
-  if (videoURL !== undefined) lesson_to_update.videoURL = videoURL;
+  // Update via structured form
+  if (form) {
+    if (form.title !== undefined) lesson_to_update.title = form.title;
+
+    if (form.order !== undefined) lesson_to_update.order = form.order;
+    if (form.mainTitle !== undefined)
+      lesson_to_update.mainTitle = form.mainTitle;
+    if (form.videoURL !== undefined) lesson_to_update.videoURL = form.videoURL;
+  }
+
+  // Update sections
+  if (sectionData) {
+    lesson_to_update.sections = sectionData;
+  }
 
   await getCourse.save();
 
-  return Response.json({ lesson: lesson_to_update });
+  return Response.json({ updatedLesson: lesson_to_update });
 }
 
 export async function DELETE(request, { params }) {
@@ -58,7 +68,6 @@ export async function DELETE(request, { params }) {
 
   return Response.json({ success: true, deletedLessonId: lessonId });
 }
-
 
 export async function GET(request, { params }) {
   await ConnectDB();

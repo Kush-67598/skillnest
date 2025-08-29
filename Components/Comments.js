@@ -41,58 +41,73 @@ const CommentItem = ({
   replyText,
   setReplyText,
   postComment,
-}) => (
-  <div className="bg-gray-700 p-4 rounded-md mt-2">
-    <p className="font-semibold">{comment.author}</p>
-    <p>{comment.text}</p>
+}) => {
+  const isOpen = activeReply === comment._id; // check if replies are visible
 
-    <button
-      onClick={() =>
-        setActiveReply((prev) => (prev === comment._id ? null : comment._id))
-      }
-      className="text-red-400 my-2"
-    >
-      Reply →
-    </button>
+  return (
+    <div className="bg-gray-700 p-4 rounded-md mt-2 border border-gray-600 shadow-md transition hover:bg-gray-600">
+      <div
+        className="flex justify-between items-center cursor-pointer"
+        onClick={() =>
+          setActiveReply((prev) => (prev === comment._id ? null : comment._id))
+        }
+      >
+        <div className="flex items-center gap-2">
+          {/* Symbol for open/closed */}
+          <span className="text-indigo-400 font-bold">
+            {isOpen ? "▼" : "▶"}
+          </span>
+          <p className="font-semibold text-white">{comment.author}</p>
+        </div>
 
-    {activeReply === comment._id && (
-      <div className="mt-2">
-        <input
-          type="text"
-          value={replyText}
-          onChange={(e) => setReplyText(e.target.value)}
-          placeholder="Write a reply..."
-          className="bg-gray-600 p-2 rounded-3xl w-full placeholder-gray-400 text-white"
-        />
-        <button
-          onClick={() => {
-            postComment(comment._id);
-            setReplyText("");
-          }}
-          className="bg-green-500 px-3 py-1 rounded-md mt-2"
-        >
-          Post Reply
-        </button>
+        <span className="text-gray-400 text-sm">
+          {comment.replies.length} replies
+        </span>
       </div>
-    )}
 
-    {comment.replies.length > 0 && (
-      <div className="ml-6 mt-2 space-y-2">
-        {comment.replies.map((r) => (
-          <CommentItem
-            key={r._id}
-            comment={r}
-            activeReply={activeReply}
-            setActiveReply={setActiveReply}
-            replyText={replyText}
-            setReplyText={setReplyText}
-            postComment={postComment}
+      <p className="mt-2 text-gray-200">{comment.text}</p>
+
+      {/* Reply input shown only if this parent is active */}
+      {isOpen && (
+        <div className="mt-3 ml-6">
+          <input
+            type="text"
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+            placeholder="Write a reply..."
+            className="bg-gray-600 p-2 rounded-3xl w-full placeholder-gray-400 text-white"
           />
-        ))}
-      </div>
-    )}
-  </div>
-);
+          <button
+            onClick={() => {
+              postComment(comment._id);
+              setReplyText("");
+            }}
+            className="bg-green-500 px-4 py-1 rounded-md mt-2 hover:bg-green-600"
+          >
+            Post Reply
+          </button>
+
+          {/* Render replies */}
+          {comment.replies.length > 0 && (
+            <div className="mt-3 space-y-2 ml-4 border-l-2 border-gray-500 pl-4">
+              {comment.replies.map((r) => (
+                <CommentItem
+                  key={r._id}
+                  comment={r}
+                  activeReply={activeReply}
+                  setActiveReply={setActiveReply}
+                  replyText={replyText}
+                  setReplyText={setReplyText}
+                  postComment={postComment}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function CommentsPage({ course }) {
   const [author, setAuthor] = useState("");
@@ -140,31 +155,34 @@ export default function CommentsPage({ course }) {
   };
 
   return (
-    <div className="bg-gray-800 min-h-screen p-6 text-white">
+    <div className="bg-gray-800 my-6 rounded-2xl p-6 text-white">
       <h1 className="text-3xl font-bold mb-4">Comments</h1>
 
       {/* Add new top-level comment */}
-      <div className="flex mb-6 space-x-2">
-        <input
-          type="text"
-          placeholder="Your Name"
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
-          className="flex-1 p-2 rounded-md bg-gray-700 border-2 border-red-500 text-white placeholder-gray-400"
-        />
-        <input
-          type="text"
-          placeholder="Write a comment..."
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          className="flex-2 p-2 rounded-md bg-gray-700 border-2 border-red-500 text-white placeholder-gray-400"
-        />
-        <button
-          onClick={() => postComment()}
-          className="bg-purple-500 px-4 py-2 rounded-md hover:bg-purple-600"
-        >
-          Post
-        </button>
+      <div className="flex  justify-center mb-6 space-x-2">
+        <div className="flex flex-col items-center justify-center my-4">
+          <input
+            type="text"
+            placeholder="Your Name"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            className=" p-2 lg:w-[90vw] w-[20rem] rounded-md my-3 bg-gray-700 text-white placeholder-gray-400"
+          />
+          <textarea
+            rows={8}
+            type="text"
+            placeholder="Write a comment..."
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            className=" p-2 lg:w-[90vw] w-[20rem] rounded-md bg-gray-700  text-white placeholder-gray-400"
+          />
+          <button
+            onClick={() => postComment()}
+            className="bg-purple-500 px-4 py-2 my-4 rounded-md hover:bg-purple-600"
+          >
+            Post
+          </button>
+        </div>
       </div>
 
       {/* Render nested comments */}

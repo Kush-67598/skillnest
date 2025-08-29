@@ -9,16 +9,38 @@ const FeedbackPage = () => {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  // Handle input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  // Submit form to API
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Send feedback to API
-    console.log("Feedback Submitted:", formData);
-    setSubmitted(true);
+    setLoading(true);
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        const err = await res.json();
+        alert(err.error || "Failed to submit feedback");
+      }
+    } catch (err) {
+      console.error("Error submitting feedback:", err);
+      alert("Something went wrong. Try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -40,9 +62,9 @@ const FeedbackPage = () => {
             <input
               type="text"
               name="name"
-              required
               value={formData.name}
               onChange={handleChange}
+              required
               className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -55,9 +77,9 @@ const FeedbackPage = () => {
             <input
               type="email"
               name="email"
-              required
               value={formData.email}
               onChange={handleChange}
+              required
               className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -70,19 +92,20 @@ const FeedbackPage = () => {
             <textarea
               name="message"
               rows="4"
-              required
               value={formData.message}
               onChange={handleChange}
+              required
               className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-blue-500"
-            ></textarea>
+            />
           </div>
 
           {/* Submit */}
           <button
             type="submit"
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold text-white shadow-lg transition"
+            disabled={loading}
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold text-white shadow-lg transition disabled:opacity-50"
           >
-            Submit Feedback
+            {loading ? "Submitting..." : "Submit Feedback"}
           </button>
         </form>
       ) : (
