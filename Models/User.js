@@ -14,6 +14,11 @@ const UserSchema = new mongoose.Schema({
       Question: { type: String, default: "" },
       Answer: { type: String, default: "" },
       Difficulty: { type: String, default: "" },
+      POTDStreak: { type: Number, default: 0 },
+      TotalSolved: { type: Number, default: 0 },
+      OverallCodingScore: { type: Number, default: 0 },
+      lastSolvedDate: { type: Date, default: null },
+       expiresAt: { type: Date, required: true },
     },
   ],
 

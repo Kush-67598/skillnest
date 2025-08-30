@@ -1,59 +1,54 @@
 "use client";
 import { useEffect, useState } from "react";
 
-/**
- * Build nested comments tree from flat comments
- */
-// function buildTree(comments, parentId = null) {
-//   return comments
-//     .filter((c) => String(c.parentId) === String(parentId))
-//     .map((c) => ({ ...c, replies: buildTree(comments, c._id) }));
-// }
-
 function buildTree(comments) {
-  const map = {}; //all the Comments which are not top level
-  const roots = []; //All the comments whcih have parent ID null
+  const map = {};
+  const roots = [];
+
   comments.forEach((c) => {
-    map[c._id] = { ...c, replies: [] }; //this loop creates a map of all Comments and set replies empty array
+    map[c._id] = { ...c, replies: [] };
   });
 
   comments.forEach((c) => {
-    //This loop loop over Each Comment  and checks if c have its parentID then check in map object with that parentId if true then push it into that map key replies of that c._id
-
     if (c.parentId) {
       if (map[c.parentId]) {
         map[c.parentId].replies.push(map[c._id]);
       }
     } else {
-      roots.push(map[c._id]); //IF No parent is present then its a root COmment so puhs into Roots
+      roots.push(map[c._id]);
     }
   });
+
   return roots;
 }
 
-/**
- * Recursive component to render a comment and its replies
- */
 const CommentItem = ({
   comment,
-  activeReply,
-  setActiveReply,
-  replyText,
-  setReplyText,
+  openComments,
+  setOpenComments,
+  replyingTo,
+  setReplyingTo,
+  replyTexts,
+  setReplyTexts,
   postComment,
 }) => {
-  const isOpen = activeReply === comment._id; // check if replies are visible
+  const isOpen = openComments[comment._id] || false;
+  const isReplying = replyingTo[comment._id] || false;
+  const replyText = replyTexts[comment._id] || "";
 
   return (
     <div className="bg-gray-700 p-4 rounded-md mt-2 border border-gray-600 shadow-md transition hover:bg-gray-600">
+      {/* Header */}
       <div
         className="flex justify-between items-center cursor-pointer"
         onClick={() =>
-          setActiveReply((prev) => (prev === comment._id ? null : comment._id))
+          setOpenComments((prev) => ({
+            ...prev,
+            [comment._id]: !prev[comment._id],
+          }))
         }
       >
         <div className="flex items-center gap-2">
-          {/* Symbol for open/closed */}
           <span className="text-indigo-400 font-bold">
             {isOpen ? "▼" : "▶"}
           </span>
@@ -67,42 +62,63 @@ const CommentItem = ({
 
       <p className="mt-2 text-gray-200">{comment.text}</p>
 
-      {/* Reply input shown only if this parent is active */}
-      {isOpen && (
+      {/* Reply button */}
+      <button
+        className="text-sm text-blue-400 mt-2"
+        onClick={() =>
+          setReplyingTo((prev) => ({
+            ...prev,
+            [comment._id]: !prev[comment._id],
+          }))
+        }
+      >
+        {isReplying ? "Cancel Reply" : "Reply"}
+      </button>
+
+      {/* Reply input */}
+      {isReplying && (
         <div className="mt-3 ml-6">
           <input
             type="text"
             value={replyText}
-            onChange={(e) => setReplyText(e.target.value)}
+            onChange={(e) =>
+              setReplyTexts((prev) => ({
+                ...prev,
+                [comment._id]: e.target.value,
+              }))
+            }
             placeholder="Write a reply..."
             className="bg-gray-600 p-2 rounded-3xl w-full placeholder-gray-400 text-white"
           />
           <button
             onClick={() => {
-              postComment(comment._id);
-              setReplyText("");
+              postComment(comment._id, replyText);
+              setReplyTexts((prev) => ({ ...prev, [comment._id]: "" }));
+              setReplyingTo((prev) => ({ ...prev, [comment._id]: false }));
             }}
             className="bg-green-500 px-4 py-1 rounded-md mt-2 hover:bg-green-600"
           >
             Post Reply
           </button>
+        </div>
+      )}
 
-          {/* Render replies */}
-          {comment.replies.length > 0 && (
-            <div className="mt-3 space-y-2 ml-4 border-l-2 border-gray-500 pl-4">
-              {comment.replies.map((r) => (
-                <CommentItem
-                  key={r._id}
-                  comment={r}
-                  activeReply={activeReply}
-                  setActiveReply={setActiveReply}
-                  replyText={replyText}
-                  setReplyText={setReplyText}
-                  postComment={postComment}
-                />
-              ))}
-            </div>
-          )}
+      {/* Nested replies */}
+      {isOpen && comment.replies.length > 0 && (
+        <div className="mt-3 space-y-2 ml-4 border-l-2 border-gray-500 pl-4">
+          {comment.replies.map((r) => (
+            <CommentItem
+              key={r._id}
+              comment={r}
+              openComments={openComments}
+              setOpenComments={setOpenComments}
+              replyingTo={replyingTo}
+              setReplyingTo={setReplyingTo}
+              replyTexts={replyTexts}
+              setReplyTexts={setReplyTexts}
+              postComment={postComment}
+            />
+          ))}
         </div>
       )}
     </div>
@@ -113,68 +129,70 @@ export default function CommentsPage({ course }) {
   const [author, setAuthor] = useState("");
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState([]);
-  const [activeReply, setActiveReply] = useState(null);
-  const [replyText, setReplyText] = useState("");
 
-  // Fetch comments from API
+  const [openComments, setOpenComments] = useState({}); // track multiple expanded
+  const [replyingTo, setReplyingTo] = useState({}); // track multiple reply boxes
+  const [replyTexts, setReplyTexts] = useState({});
+
   const fetchComments = async () => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API}/api/Comments?courseId=${course._id}`
-    );
-    const data = await res.json();
-    const tree = buildTree(data.comments || []);
-    setComments(tree);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API}/api/Comments?courseId=${course._id}`
+      );
+      const data = await res.json();
+      setComments(buildTree(data.comments || []));
+    } catch (err) {
+      console.error("Failed to fetch comments:", err);
+    }
   };
 
   useEffect(() => {
     fetchComments();
   }, []);
 
-  // Post a comment or reply
-  const postComment = async (parentId = null) => {
-    if (!author || (!newComment && !replyText)) return;
+  const postComment = async (parentId = null, textOverride = null) => {
+    const textToSend = parentId ? textOverride : newComment;
+    if (!author || !textToSend) return;
 
-    const textToSend = parentId ? replyText : newComment;
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API}/api/Comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: textToSend,
+          author,
+          parentId,
+          courseId: course._id,
+        }),
+      });
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Comments`, {
-      method: "POST",
-      body: JSON.stringify({
-        text: textToSend,
-        author,
-        parentId,
-        courseId: course._id,
-      }),
-    });
-    const data = await res.json();
-    console.log(data);
-
-    setNewComment("");
-    setReplyText("");
-    setActiveReply(null);
-    fetchComments();
+      setNewComment("");
+      fetchComments();
+    } catch (err) {
+      console.error("Failed to post comment:", err);
+    }
   };
 
   return (
     <div className="bg-gray-800 my-6 rounded-2xl p-6 text-white">
       <h1 className="text-3xl font-bold mb-4">Comments</h1>
 
-      {/* Add new top-level comment */}
-      <div className="flex  justify-center mb-6 space-x-2">
+      {/* Top-level comment */}
+      <div className="flex justify-center mb-6 space-x-2">
         <div className="flex flex-col items-center justify-center my-4">
           <input
             type="text"
             placeholder="Your Name"
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
-            className=" p-2 lg:w-[90vw] w-[20rem] rounded-md my-3 bg-gray-700 text-white placeholder-gray-400"
+            className="p-2 lg:w-[90vw] w-[20rem] rounded-md my-3 bg-gray-700 text-white placeholder-gray-400"
           />
           <textarea
-            rows={8}
-            type="text"
+            rows={5}
             placeholder="Write a comment..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            className=" p-2 lg:w-[90vw] w-[20rem] rounded-md bg-gray-700  text-white placeholder-gray-400"
+            className="p-2 lg:w-[90vw] w-[20rem] rounded-md bg-gray-700 text-white placeholder-gray-400"
           />
           <button
             onClick={() => postComment()}
@@ -185,17 +203,19 @@ export default function CommentsPage({ course }) {
         </div>
       </div>
 
-      {/* Render nested comments */}
+      {/* Comments list */}
       <div className="space-y-4">
         {comments.length > 0 ? (
           comments.map((c) => (
             <CommentItem
               key={c._id}
               comment={c}
-              activeReply={activeReply}
-              setActiveReply={setActiveReply}
-              replyText={replyText}
-              setReplyText={setReplyText}
+              openComments={openComments}
+              setOpenComments={setOpenComments}
+              replyingTo={replyingTo}
+              setReplyingTo={setReplyingTo}
+              replyTexts={replyTexts}
+              setReplyTexts={setReplyTexts}
               postComment={postComment}
             />
           ))

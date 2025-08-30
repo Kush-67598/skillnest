@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import {
   FaBook,
@@ -21,6 +21,19 @@ export default function ProfilePage({ user }) {
     Answer: "",
     Difficulty: "",
   });
+  const [UserData, setUserData] = useState([]);
+  useEffect(() => {
+    const userFetch = async () => {
+      const response = await fetch("/api/User", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("USER_TOKEN")}`,
+        },
+      });
+      const res = await response.json();
+      setUserData(res.POTD);
+    };
+    userFetch();
+  }, []);
 
   const [file, setFile] = useState(null);
   const [image, setImage] = useState(user?.profileImg || null);
@@ -96,12 +109,12 @@ export default function ProfilePage({ user }) {
     <>
       <ToastContainer />
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-black flex justify-center py-8 px-4">
-        <div className="w-full max-w-md md:max-w-3xl space-y-6">
-          {/* Profile Card */}
-          <div className="bg-gray-800/70 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-xl p-6 text-center">
+      <div className="min-h-screen bg-gradient-to-tr from-gray-950 via-gray-900 to-black text-white px-6 py-10 flex justify-center">
+        <div className="w-full max-w-5xl grid md:grid-cols-3 gap-8">
+          {/* Left Profile Section */}
+          <div className="bg-gray-800/60 border border-gray-700 rounded-2xl shadow-lg p-6 flex flex-col items-center text-center space-y-4">
             <div
-              className="relative w-32 h-32 mx-auto rounded-full overflow-hidden group cursor-pointer ring-4 ring-emerald-500/40"
+              className="relative w-32 h-32 rounded-full overflow-hidden ring-4 ring-purple-500/50 cursor-pointer group"
               onClick={() => fileInputRef.current.click()}
             >
               <Image
@@ -110,13 +123,13 @@ export default function ProfilePage({ user }) {
                 fill
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                 <FaUserEdit className="text-white text-2xl" />
               </div>
               <input
                 type="file"
-                className="hidden"
                 ref={fileInputRef}
+                className="hidden"
                 accept="image/*"
                 onChange={(e) => setFile(e.target.files[0])}
               />
@@ -126,174 +139,154 @@ export default function ProfilePage({ user }) {
               <button
                 onClick={handleUpload}
                 disabled={loading}
-                className="mt-4 px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold shadow-md hover:bg-emerald-500 transition"
+                className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 transition text-sm font-medium"
               >
-                {loading ? "Uploading..." : "Update Profile Picture"}
+                {loading ? "Uploading..." : "Update Picture"}
               </button>
             )}
 
-            <h2 className="text-xl font-bold text-white mt-4">{user.name}</h2>
+            <h2 className="text-xl font-bold">{user.name}</h2>
             <p className="text-gray-400 text-sm">@{user.email}</p>
 
-            <div className="flex justify-around mt-6 text-gray-300">
-              <div>
-                <p className="text-sm font-semibold">100,000</p>
-                <p className="text-xs text-gray-500">Followers</p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold">4</p>
-                <p className="text-xs text-gray-500">Following</p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold">2</p>
-                <p className="text-xs text-gray-500">Articles</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Activities */}
-          <div className="bg-gray-800/70 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-lg p-4 space-y-4">
-            <h3 className="text-sm font-semibold text-gray-300 border-b border-gray-600 pb-2">
-              Activities
-            </h3>
-            <div className="grid grid-cols-1 gap-3 text-center">
-              <p
+            <div className="w-full mt-6 space-y-2">
+              <button
                 onClick={async () => {
                   await POTDGROQ();
                   router.push("/POTD");
                 }}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold cursor-pointer rounded-xl p-3 transition shadow-md"
+                className="w-full py-2 rounded-lg bg-gradient-to-r from-purple-950 to-purple-700 hover:from-purple-900 hover:to-purple-700 transition font-semibold"
               >
-                Get Your POTD for Today
-              </p>
-              <div className="bg-gray-900 rounded-lg p-2 border border-gray-700">
-                <p className="text-xs text-gray-400">POTD Streak</p>
-                <p className="text-sm font-semibold text-white">--</p>
-              </div>
-              <div className="bg-gray-900 rounded-lg p-2 border border-gray-700">
-                <p className="text-xs text-gray-400">Overall Coding Score</p>
-                <p className="text-sm font-semibold text-white">--</p>
-              </div>
-              <div className="bg-gray-900 rounded-lg p-2 border border-gray-700">
-                <p className="text-xs text-gray-400">Total Solved</p>
-                <p className="text-sm font-semibold text-white">--</p>
-              </div>
-              <div className="bg-gray-900 rounded-lg p-2 border border-gray-700">
-                <p className="text-xs text-gray-400">Monthly Coding Score</p>
-                <p className="text-sm font-semibold text-white">--</p>
-              </div>
-            </div>
-            <button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl py-2 text-sm font-medium shadow-md transition">
-              POTD ➤
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="bg-gray-800/70 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-lg p-4 space-y-2">
-            <h3 className="text-sm font-semibold text-gray-300 border-b border-gray-600 pb-2">
-              Content
-            </h3>
-            <div className="space-y-2">
-              <div
-                onClick={() => router.push("/Bookmarks")}
-                className="flex items-center justify-between bg-gray-900 border border-gray-700 hover:bg-gray-700 rounded-md px-3 py-2 cursor-pointer text-gray-300"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-emerald-500">
-                    <FaBookmark />
-                  </span>
-                  Bookmarks
-                </div>
-                <span className="text-gray-500">›</span>
-              </div>
-              <div
-                onClick={() => router.push("/MyCourses")}
-                className="flex items-center justify-between bg-gray-900 border border-gray-700 hover:bg-gray-700 rounded-md px-3 py-2 cursor-pointer text-gray-300"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-emerald-500">
-                    <FaBook />
-                  </span>
-                  My Courses
-                </div>
-                <span className="text-gray-500">›</span>
-              </div>
+                Daily Challenge ➤
+              </button>
             </div>
           </div>
 
-          {/* Preferences */}
-          <div className="bg-gray-800/70 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-lg p-4 space-y-2">
-            <h3 className="text-sm font-semibold text-gray-300 border-b border-gray-600 pb-2">
-              Preferences
-            </h3>
-            <div className="space-y-2">
-              <div
-                onClick={() => router.push("/Settings")}
-                className="flex items-center justify-between bg-gray-900 border border-gray-700 hover:bg-gray-700 rounded-md px-3 py-2 cursor-pointer text-gray-300"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-emerald-500">
-                    <FaCog />
-                  </span>
-                  Settings
-                </div>
-                <span className="text-gray-500">›</span>
-              </div>
+          {/* Middle - Stats */}
+          <div className="md:col-span-2 space-y-8">
+            <div className="bg-gray-800/60 border border-gray-700 rounded-2xl shadow-lg p-6">
+              <h3 className="text-sm font-semibold text-gray-300 mb-4">
+                Your Progress
+              </h3>
+              {UserData.length > 0 ? (
+                UserData.map((POTD, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-1 sm:grid-cols-3 gap-6"
+                  >
+                    <div className="bg-gray-900 rounded-2xl p-4 border border-gray-700 shadow-md hover:border-purple-500 transition">
+                      <p className="text-xs text-gray-400">🔥 Streak</p>
+                      <p className="text-xl font-bold mt-2">
+                        {POTD.POTDStreak}
+                      </p>
+                    </div>
 
-              <div
-                onClick={() => router.push("/About")}
-                className="flex items-center justify-between bg-gray-900 border border-gray-700 hover:bg-gray-700 rounded-md px-3 py-2 cursor-pointer text-gray-300"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-emerald-500">
-                    <FaInfoCircle />
-                  </span>
-                  About Us
-                </div>
-                <span className="text-gray-500">›</span>
-              </div>
+                    <div className="bg-gray-900 rounded-2xl p-4 border border-gray-700 shadow-md hover:border-indigo-500 transition">
+                      <p className="text-xs text-gray-400">💻 Coding Score</p>
+                      <p className="text-xl font-bold mt-2">
+                        {POTD.OverallCodingScore}
+                      </p>
+                    </div>
 
-              <div
-                onClick={() => router.push("/Legal")}
-                className="flex items-center justify-between bg-gray-900 border border-gray-700 hover:bg-gray-700 rounded-md px-3 py-2 cursor-pointer text-gray-300"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-emerald-500">
-                    <FaShieldAlt />
-                  </span>
-                  Legal Policy
-                </div>
-                <span className="text-gray-500">›</span>
-              </div>
+                    <div className="bg-gray-900 rounded-2xl p-4 border border-gray-700 shadow-md hover:border-yellow-500 transition">
+                      <p className="text-xs text-gray-400">✅ Total Solved</p>
+                      <p className="text-xl font-bold mt-2">
+                        {POTD.TotalSolved}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">No progress yet...</p>
+              )}
+            </div>
 
-              <div
-                onClick={() => router.push("/Feedback")}
-                className="flex items-center justify-between bg-gray-900 border border-gray-700 hover:bg-gray-700 rounded-md px-3 py-2 cursor-pointer text-gray-300"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-emerald-500">
-                    <FaComment />
-                  </span>
-                  Feedback
+            {/* Content Section */}
+            <div className="bg-gray-800/60 border border-gray-700 rounded-2xl shadow-lg p-6 space-y-4">
+              <h3 className="text-sm font-semibold text-gray-300">Content</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div
+                  onClick={() => router.push("/Bookmarks")}
+                  className="flex items-center justify-between bg-gray-900 border border-gray-700 hover:bg-gray-700 rounded-xl px-4 py-3 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <FaBookmark className="text-purple-500" /> Bookmarks
+                  </div>
+                  <span className="text-gray-500">›</span>
                 </div>
-                <span className="text-gray-500">›</span>
-              </div>
 
-              <div
-                onClick={() => {
-                  toast.info("Logged Out Successfully", { autoClose: 1000 });
-                  setTimeout(() => {
-                    localStorage.removeItem("USER_TOKEN");
-                    router.push("/auth/login");
-                  }, 2000);
-                }}
-                className="flex items-center justify-between bg-gray-900 border border-gray-700 hover:bg-gray-700 rounded-md px-3 py-2 cursor-pointer text-red-400"
-              >
-                <div className="flex items-center gap-2">
-                  <FaSignOutAlt />
-                  Logout
+                <div
+                  onClick={() => router.push("/MyCourses")}
+                  className="flex items-center justify-between bg-gray-900 border border-gray-700 hover:bg-gray-700 rounded-xl px-4 py-3 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <FaBook className="text-purple-500" /> My Courses
+                  </div>
+                  <span className="text-gray-500">›</span>
                 </div>
-                <span className="text-gray-500">›</span>
+              </div>
+            </div>
+
+            {/* Preferences */}
+            <div className="bg-gray-800/60 border border-gray-700 rounded-2xl shadow-lg p-6 space-y-4">
+              <h3 className="text-sm font-semibold text-gray-300">
+                Preferences
+              </h3>
+              <div className="space-y-3">
+                <div
+                  onClick={() => router.push("/Settings")}
+                  className="flex items-center justify-between bg-gray-900 hover:bg-gray-700 border border-gray-700 rounded-xl px-4 py-3 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <FaCog className="text-purple-500" /> Settings
+                  </div>
+                  <span className="text-gray-500">›</span>
+                </div>
+
+                <div
+                  onClick={() => router.push("/About")}
+                  className="flex items-center justify-between bg-gray-900 hover:bg-gray-700 border border-gray-700 rounded-xl px-4 py-3 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <FaInfoCircle className="text-purple-500" /> About Us
+                  </div>
+                  <span className="text-gray-500">›</span>
+                </div>
+
+                <div
+                  onClick={() => router.push("/Legal")}
+                  className="flex items-center justify-between bg-gray-900 hover:bg-gray-700 border border-gray-700 rounded-xl px-4 py-3 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <FaShieldAlt className="text-purple-500" /> Legal Policy
+                  </div>
+                  <span className="text-gray-500">›</span>
+                </div>
+
+                <div
+                  onClick={() => router.push("/Feedback")}
+                  className="flex items-center justify-between bg-gray-900 hover:bg-gray-700 border border-gray-700 rounded-xl px-4 py-3 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <FaComment className="text-purple-500" /> Feedback
+                  </div>
+                  <span className="text-gray-500">›</span>
+                </div>
+
+                <div
+                  onClick={() => {
+                    toast.info("Logged Out Successfully", { autoClose: 1000 });
+                    setTimeout(() => {
+                      localStorage.removeItem("USER_TOKEN");
+                      router.push("/auth/login");
+                    }, 2000);
+                  }}
+                  className="flex items-center justify-between bg-gray-900 hover:bg-gray-700 border border-gray-700 rounded-xl px-4 py-3 cursor-pointer text-red-400"
+                >
+                  <div className="flex items-center gap-2">
+                    <FaSignOutAlt /> Logout
+                  </div>
+                  <span className="text-gray-500">›</span>
+                </div>
               </div>
             </div>
           </div>

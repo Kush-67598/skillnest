@@ -139,7 +139,13 @@ export default function SingleLesson({
               )}
               {section.images.map((img, imgidx) => (
                 <div key={imgidx}>
-                 <Image width={900} height={20} className="bg-red-500 h-96  " alt="image" src={img}></Image>
+                  <Image
+                    width={900}
+                    height={20}
+                    className="bg-red-500 h-96  "
+                    alt="image"
+                    src={img}
+                  ></Image>
                 </div>
               ))}
 
