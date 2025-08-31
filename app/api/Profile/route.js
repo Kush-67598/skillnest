@@ -1,5 +1,6 @@
 import User from "@/Models/User";
 import { ConnectDB } from "@/Hooks/useConnectDB";
+import { NextResponse } from "next/server";
 export async function POST(req) {
   await ConnectDB();
   const { email, image } = await req.json();
@@ -9,12 +10,12 @@ export async function POST(req) {
     { new: true }
   );
   if (!user) {
-    return Response.json(
+    return NextResponse.json(
       { success: false, message: "User not found" },
       { status: 404 }
     );
   }
-  return Response.json({
+  return NextResponse.json({
     user,
     success: true,
     message: "Profile Uploaded Successfully",

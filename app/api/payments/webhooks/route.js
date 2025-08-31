@@ -1,6 +1,7 @@
 import { validateWebhookSignature } from "razorpay/dist/utils/razorpay-utils";
 import Transaction from "@/Models/Transaction";
 import User from "@/Models/User";
+import { NextResponse } from "next/server";
 export async function POST(req) {
   const webhookSignature = req.headers.get("X-Razorpay-Signature");
   const webhookSecret = process.env.WEBHOOK_SECRET;
@@ -11,7 +12,7 @@ export async function POST(req) {
     webhookSecret
   );
   if (!validate) {
-    return Response.json({ success: false });
+    return NextResponse.json({ success: false });
   }
   const payload = JSON.parse(webhookBody);
   const entity = payload.payload.payment.entity;
@@ -27,5 +28,5 @@ export async function POST(req) {
   }
   console.log("kushRes", webhookBody);
 
-  return Response.json({ success: true, KUSHRES: webhookBody });
+  return NextResponse.json({ success: true, KUSHRES: webhookBody });
 }

@@ -1,5 +1,6 @@
 import { ConnectDB } from "@/Hooks/useConnectDB";
 import Transaction from "@/Models/Transaction";
+import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
 
 export async function POST(req) {
@@ -37,7 +38,7 @@ export async function POST(req) {
     },
   });
 
-  return Response.json({
+  return NextResponse.json({
     model: CreateTransaction,
     razor: order,
   });

@@ -1,6 +1,7 @@
 import { ConnectDB } from "@/Hooks/useConnectDB";
 import User from "@/Models/User";
 import { getAuthUser } from "@/app/utils/Auth_header";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
   await ConnectDB();
@@ -22,7 +23,7 @@ export async function POST(req) {
   if (!exists) {
     Verified_User.POTD.push(POTD_Data);
     await Verified_User.save();
-    return Response.json({
+    return NextResponse.json({
       success: true,
       message: "Question successfully added to your POTD",
     });
@@ -31,14 +32,14 @@ export async function POST(req) {
   if (Verified_User.POTD[0].expiresAt < today) {
     Verified_User.POTD[0] = POTD_Data;
     await Verified_User.save();
-    return Response.json({
+    return NextResponse.json({
       success: true,
       message: "Previous POTD expired. New POTD assigned successfully.",
     });
   }
 
   // Still valid
-  return Response.json({
+  return NextResponse.json({
     success: false,
     message: "Problem already assigned for today",
   });

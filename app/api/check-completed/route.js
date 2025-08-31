@@ -10,14 +10,14 @@
 //   const token = req.headers.get("authorization")?.split(" ")[1];
 
 //   if (!token) {
-//     return Response.json({ error: "Unauthorized" }, { status: 401 });
+//     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 //   }
 
 //   const { email } = jwt.verify(token, "jwtsecret");
 
 //   const user = await User.findOne({ email }).populate("courses");
 //   if (!user) {
-//     return Response.json({ error: "User not found" }, { status: 404 });
+//     return NextResponse.json({ error: "User not found" }, { status: 404 });
 //   }
 
 //   // Find or create progress
@@ -37,20 +37,20 @@
 //   progress.completedSubChapters ||= [];
 //   progress.completedLessons ||= [];
 
-//   let responseData = { success: true };
+//   let NextResponseData = { success: true };
 
 //   // Update completed items
 //   if (chapterId && !progress.completedChapters.includes(chapterId)) {
 //     progress.completedChapters.push(chapterId);
-//     responseData.chapterSuccess = true;
+//     NextResponseData.chapterSuccess = true;
 //   }
 //   if (subchapterId && !progress.completedSubChapters.includes(subchapterId)) {
 //     progress.completedSubChapters.push(subchapterId);
-//     responseData.subchapterSuccess = true;
+//     NextResponseData.subchapterSuccess = true;
 //   }
 //   if (lessonId && !progress.completedLessons.includes(lessonId)) {
 //     progress.completedLessons.push(lessonId);
-//     responseData.lessonSuccess = true;
+//     NextResponseData.lessonSuccess = true;
 //   }
 
 //   await progress.save();
@@ -58,7 +58,7 @@
 //   // Count completed items using loops
 //   const course = user.courses.find((c) => c._id.toString() === courseId);
 //   if (!course) {
-//     return Response.json({ error: "Course not found for this user" }, { status: 404 });
+//     return NextResponse.json({ error: "Course not found for this user" }, { status: 404 });
 //   }
 
 //   let chaptercount = 0;
@@ -83,11 +83,11 @@
 //     }
 //   }
 
-//   responseData.chaptercount = chaptercount;
-//   responseData.subchaptercount = subchaptercount;
-//   responseData.lessoncount = lessoncount;
+//   NextResponseData.chaptercount = chaptercount;
+//   NextResponseData.subchaptercount = subchaptercount;
+//   NextResponseData.lessoncount = lessoncount;
 
-//   return Response.json(responseData);
+//   return NextResponse.json(NextResponseData);
 // }
 
 // export async function GET(req) {
@@ -97,25 +97,26 @@
 
 //   const token = req.headers.get("authorization")?.split(" ")[1];
 //   if (!token) {
-//     return Response.json({ error: "Unauthorized" }, { status: 401 });
+//     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 //   }
 
 //   const { email } = jwt.verify(token, "jwtsecret");
 //   const user = await User.findOne({ email });
 
 //   if (!user) {
-//     return Response.json({ error: "User not found" }, { status: 404 });
+//     return NextResponse.json({ error: "User not found" }, { status: 404 });
 //   }
 
 //   const progress = await TrackCourse.findOne({ user: user._id, courseId });
 
-//   return Response.json({ progress });
+//   return NextResponse.json({ progress });
 // }
 
 import TrackCourse from "@/Models/TrackCourse";
 import { ConnectDB } from "@/Hooks/useConnectDB";
 import User from "@/Models/User";
 import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
   await ConnectDB();
@@ -124,14 +125,14 @@ export async function POST(req) {
   const token = req.headers.get("authorization")?.split(" ")[1];
 
   if (!token) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { email } = jwt.verify(token, "jwtsecret");
 
   const user = await User.findOne({ email }).populate("courses");
   if (!user) {
-    return Response.json({ error: "User not found" }, { status: 404 });
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
   // Find or create progress
@@ -151,22 +152,22 @@ export async function POST(req) {
   progress.completedSubChapters = progress.completedSubChapters || [];
   progress.completedLessons = progress.completedLessons || [];
 
-  let responseData = { success: true };
+  let NextResponseData = { success: true };
 
   // Update completed items
   if (chapterId && !progress.completedChapters.includes(chapterId)) {
     progress.completedChapters.push(chapterId);
-    responseData.chapterSuccess = true;
+    NextResponseData.chapterSuccess = true;
   }
 
   if (subchapterId && !progress.completedSubChapters.includes(subchapterId)) {
     progress.completedSubChapters.push(subchapterId);
-    responseData.subchapterSuccess = true;
+    NextResponseData.subchapterSuccess = true;
   }
 
   if (lessonId && !progress.completedLessons.includes(lessonId)) {
     progress.completedLessons.push(lessonId);
-    responseData.lessonSuccess = true;
+    NextResponseData.lessonSuccess = true;
   }
 
   await progress.save();
@@ -174,7 +175,7 @@ export async function POST(req) {
   // Calculate counts for frontend
   const course = user.courses.find((c) => c._id.toString() === courseId);
   if (!course) {
-    return Response.json({ error: "Course not found for this user" }, { status: 404 });
+    return NextResponse.json({ error: "Course not found for this user" }, { status: 404 });
   }
 
   let chapterCount = 0;
@@ -199,11 +200,11 @@ export async function POST(req) {
     });
   });
 
-  responseData.chaptercount = chapterCount;
-  responseData.subchaptercount = subchapterCount;
-  responseData.lessoncount = lessonCount;
+  NextResponseData.chaptercount = chapterCount;
+  NextResponseData.subchaptercount = subchapterCount;
+  NextResponseData.lessoncount = lessonCount;
 
-  return Response.json(responseData);
+  return NextResponse.json(NextResponseData);
 }
 
 export async function GET(req) {
@@ -213,17 +214,17 @@ export async function GET(req) {
 
   const token = req.headers.get("authorization")?.split(" ")[1];
   if (!token) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { email } = jwt.verify(token, "jwtsecret");
   const user = await User.findOne({ email });
 
   if (!user) {
-    return Response.json({ error: "User not found" }, { status: 404 });
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
   const progress = await TrackCourse.findOne({ user: user._id, courseId });
 
-  return Response.json({ progress });
+  return NextResponse.json({ progress });
 }

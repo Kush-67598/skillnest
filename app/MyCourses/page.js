@@ -1,6 +1,8 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 export default function MyCoursesPage() {
   const [token, setToken] = useState(null);
@@ -9,18 +11,14 @@ export default function MyCoursesPage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // ✅ Builds dynamic URL based on non-null params
   const finalUrl = (courseId, chapterId, subchapterId, lessonId) => {
     let url = `/Course/${courseId}`;
     if (chapterId) url += `/chapters/${chapterId}/subchapters`;
     else return url;
-
     if (subchapterId) url += `/${subchapterId}/lessons`;
     else return url;
-
     if (lessonId) url += `/${lessonId}`;
     else return url;
-
     return url;
   };
 
@@ -31,9 +29,9 @@ export default function MyCoursesPage() {
 
   useEffect(() => {
     if (token) {
-      Promise.all([FetchTracked(), fetchMyCourses()]).finally(() => {
-        setLoading(false);
-      });
+      Promise.all([FetchTracked(), fetchMyCourses()]).finally(() =>
+        setLoading(false)
+      );
     }
   }, [token]);
 
@@ -41,19 +39,12 @@ export default function MyCoursesPage() {
     try {
       const res = await fetch("/api/track-progress", {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (data.success) {
-        setTrack(data.getTracked);
-        console.log(data);
-      } else {
-        console.warn("Tracking data not found");
-      }
+      if (data.success) setTrack(data.getTracked);
     } catch (err) {
-      console.error("Error fetching tracked progress:", err);
+      console.error(err);
     }
   };
 
@@ -61,22 +52,18 @@ export default function MyCoursesPage() {
     try {
       const res = await fetch("/api/enrolledCourse", {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (data.success) {
-        setMyCourses(data.courses);
-      }
+      if (data.success) setMyCourses(data.courses);
     } catch (err) {
-      console.error("Error fetching courses:", err);
+      console.error(err);
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-8 bg-black min-h-screen rounded-lg">
-      <h1 className="text-4xl font-extrabold mb-10 text-center text-white tracking-wide drop-shadow-sm">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 py-12 px-4">
+      <h1 className="text-5xl font-extrabold text-center text-white mb-12 drop-shadow-lg">
         🎓 My Courses
       </h1>
 
@@ -87,15 +74,15 @@ export default function MyCoursesPage() {
       ) : (
         <>
           {myCourses.length === 0 && (
-            <div className="text-center text-gray-500 italic text-lg mt-12">
+            <div className="text-center text-gray-400 italic text-lg mt-12">
               No Enrolled Courses yet...
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {myCourses.map((course) => {
               const trackItem = track.find((t) => t.courseId === course._id);
-
+              const progress = trackItem?.progress || 0;
               const continueUrl = trackItem
                 ? finalUrl(
                     course._id,
@@ -106,38 +93,39 @@ export default function MyCoursesPage() {
                 : `/course/${course._id}`;
 
               return (
-                <div
+                <motion.div
                   key={course._id}
-                  className="border border-gray-200 rounded-2xl p-6 bg-white shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 120 }}
+                  className="bg-gradient-to-br from-gray-800 via-gray-900 to-black border border-gray-700 rounded-3xl shadow-xl p-6 flex flex-col justify-between"
                 >
-                  <h2 className="text-xl font-bold mb-3 text-gray-900 line-clamp-1">
-                    {course.title}
-                  </h2>
-                  <p className="text-gray-600 text-sm mb-5 line-clamp-3">
-                    {course.description}
-                  </p>
+                  <div>
+                    <h2 className="text-xl font-bold text-white line-clamp-2 mb-2">
+                      {course.title}
+                    </h2>
+                    <p className="text-gray-300 text-sm line-clamp-3 mb-4">
+                      {course.description}
+                    </p>
 
-                  {/* Progress bar */}
-                  <div className="h-2 bg-gray-200 rounded-full mb-3 overflow-hidden">
-                    <div
-                      className="bg-gradient-to-r from-green-400 to-green-600 h-full transition-all duration-500"
-                      style={{ width: "70%" }}
-                    ></div>
+                    {/* Progress */}
+                    <div className="h-3 bg-gray-700 rounded-full overflow-hidden mb-2">
+                      <div
+                        className="h-full bg-gradient-to-r from-green-400 via-green-500 to-green-600 transition-all duration-500"
+                        style={{ width: `${progress}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-gray-400 mb-4">
+                      {progress}% completed
+                    </p>
                   </div>
-                  <p className="text-xs text-gray-500 mb-4">70% completed</p>
 
-                  <div className="flex space-x-3">
-                    <button
-                      onClick={() => router.push(continueUrl)}
-                      className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg shadow-md transition"
-                    >
-                      ▶ Continue
-                    </button>
-                    {/* <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg shadow-md transition">
-                      ℹ Details
-                    </button> */}
-                  </div>
-                </div>
+                  <button
+                    onClick={() => router.push(continueUrl)}
+                    className="mt-auto w-full py-2 bg-gradient-to-r from-purple-900 via-slate-500 to-purple-300 text-white font-semibold rounded-xl shadow-lg hover:scale-105 transition-transform duration-300"
+                  >
+                    ▶ Continue
+                  </button>
+                </motion.div>
               );
             })}
           </div>

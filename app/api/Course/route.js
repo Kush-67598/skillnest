@@ -2,6 +2,7 @@ import { ConnectDB } from "@/Hooks/useConnectDB";
 import Courses from "@/Models/Courses";
 import Creator from "@/Models/Creator";
 import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server";
 
 export async function POST(request) {
   await ConnectDB();
@@ -25,7 +26,7 @@ export async function POST(request) {
   Creator_Data.courses.push(c);
 
   await Creator_Data.save();
-  return Response.json({
+  return NextResponse.json({
     CreatorData: Creator_Data,
     success: true,
     AddedCourse: c,
@@ -45,6 +46,6 @@ export async function GET(req) {
     .limit(limit)
     .lean(); // only return name and email
 
-  if (!allCourses) return Response.json({ error: "No Courses Found" });
-  return Response.json({ allCourses: allCourses });
+  if (!allCourses) return NextResponse.json({ error: "No Courses Found" });
+  return NextResponse.json({ allCourses: allCourses });
 }

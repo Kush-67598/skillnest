@@ -3,12 +3,13 @@ import mongoose from "mongoose";
 import TrackCourse from "@/Models/TrackCourse";
 import User from "@/Models/User";
 import { ConnectDB } from "@/Hooks/useConnectDB";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
   try {
     const token = req.headers.get("authorization")?.split(" ")[1];
     if (!token) {
-      return Response.json(
+      return NextResponse.json(
         { success: false, message: "No token" },
         { status: 401 }
       );
@@ -18,7 +19,7 @@ export async function POST(req) {
     const email = jwt.verify(token, "jwtsecret").email;
 
     if (!mongoose.Types.ObjectId.isValid(courseId)) {
-      return Response.json(
+      return NextResponse.json(
         { success: false, message: "Invalid courseId" },
         { status: 400 }
       );
@@ -26,7 +27,7 @@ export async function POST(req) {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return Response.json(
+      return NextResponse.json(
         { success: false, message: "User not found" },
         { status: 404 }
       );
@@ -56,16 +57,16 @@ export async function POST(req) {
     );
 
     if (!updated) {
-      return Response.json(
+      return NextResponse.json(
         { success: false, message: "Tracking record not found" },
         { status: 404 }
       );
     }
 
-    return Response.json({ success: true, track: updated });
+    return NextResponse.json({ success: true, track: updated });
   } catch (err) {
     console.error(err);
-    return Response.json(
+    return NextResponse.json(
       { success: false, message: "Server error" },
       { status: 500 }
     );
@@ -77,20 +78,20 @@ export async function GET(req) {
     await ConnectDB();
     const token = req.headers.get("authorization")?.split(" ")[1];
     if (!token) {
-      return Response.json({ success: false, message: "No token" }, { status: 401 });
+      return NextResponse.json({ success: false, message: "No token" }, { status: 401 });
     }
 
     const email = jwt.verify(token, "jwtsecret").email;
     const user = await User.findOne({ email });
 
     if (!user) {
-      return Response.json({ success: false, message: "User not found" }, { status: 404 });
+      return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
     }
 
     const getTracked = await TrackCourse.find({ user: user._id });
-    return Response.json({ success: true, getTracked });
+    return NextResponse.json({ success: true, getTracked });
   } catch (error) {
     console.error(error);
-    return Response.json({ success: false, message: "Server error" }, { status: 500 });
+    return NextResponse.json({ success: false, message: "Server error" }, { status: 500 });
   }
 }

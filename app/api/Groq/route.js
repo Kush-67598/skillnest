@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 export async function POST(req) {
@@ -53,11 +54,11 @@ Return:
         },
       });
       const data = JSON.parse(response.output_text);
-      return Response.json({ data, success: true });
+      return NextResponse.json({ data, success: true });
     } catch (err) {
-      return Response.json({ err: "Cant Create Response because" + err });
+      return NextResponse.json({ err: "Cant Create Response because" + err });
     }
   } catch (err) {
-    return Response.json({ err: "Internal Server Error" });
+    return NextResponse.json({ err: "Internal Server Error" });
   }
 }

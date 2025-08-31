@@ -2,6 +2,7 @@ import { ConnectDB } from "@/Hooks/useConnectDB";
 import User from "@/Models/User";
 import Otp from "@/Models/Otp";
 import transporter from "@/app/utils/transporter";
+import { NextResponse } from "next/server";
 export async function POST(request) {
   try {
     await ConnectDB();
@@ -11,7 +12,7 @@ export async function POST(request) {
     const req_user = await User.findOne({ email });
 
     if (!req_user) {
-      return Response.json({ found: false }, { status: 400 });
+      return NextResponse.json({ found: false }, { status: 400 });
     }
 
     // Generate 6-digit OTP
@@ -43,17 +44,17 @@ If you did not request this, you can ignore this email.
       });
       await otp_user.save();
 
-      return Response.json({ success: true }, { status: 200 });
+      return NextResponse.json({ success: true }, { status: 200 });
     } catch (err) {
       console.error("Error while sending mail", err);
-      return Response.json(
+      return NextResponse.json(
         { success: false, message: "Error sending email" },
         { status: 500 }
       );
     }
   } catch (err) {
     console.error(err);
-    return Response.json(
+    return NextResponse.json(
       { success: false, message: "Internal server error" },
       { status: 500 }
     );

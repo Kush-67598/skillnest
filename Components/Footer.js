@@ -1,5 +1,6 @@
 import React from "react";
-import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { SiX } from "react-icons/si"; // X icon
 
 const Footer = () => {
   return (
@@ -17,11 +18,21 @@ const Footer = () => {
         <div>
           <h4 className="font-semibold mb-2">Quick Links</h4>
           <ul className="space-y-1 text-sm">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Courses</a></li>
-            <li><a href="#pricing">Pricing</a></li>
-            <li><a href="#FAQ">FAQ</a></li>
-            <li><a href="#Testimonials">Testimonials</a></li>
+            <li>
+              <a href="#">Home</a>
+            </li>
+            <li>
+              <a href="/Course">Courses</a>
+            </li>
+            <li>
+              <a href="#pricing">Pricing</a>
+            </li>
+            <li>
+              <a href="#FAQ">FAQ</a>
+            </li>
+            <li>
+              <a href="#Testimonials">Testimonials</a>
+            </li>
           </ul>
         </div>
 
@@ -29,9 +40,15 @@ const Footer = () => {
         <div>
           <h4 className="font-semibold mb-2">Follow Us</h4>
           <div className="flex space-x-4">
-            <a href="#"><FaGithub size={20} /></a>
-            <a href="#"><FaLinkedin size={20} /></a>
-            <a href="#"><FaTwitter size={20} /></a>
+            <a href="https://github.com/Kush-67598">
+              <FaGithub size={20} />
+            </a>
+            <a href="https://linkedin.com/in/kush-kumar-singh-623804340">
+              <FaLinkedin size={20} />
+            </a>
+            <a href="https://x.com/Kush67598">
+              <SiX size={20} />
+            </a>
           </div>
         </div>
       </div>

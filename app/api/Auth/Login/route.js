@@ -2,13 +2,14 @@ import { ConnectDB } from "@/Hooks/useConnectDB";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "@/Models/User";
+import { NextResponse } from "next/server";
 
 export async function POST(request) {
   await ConnectDB();
 
   const { email, password } = await request.json();
   if (!email || !password) {
-    return Response.json({
+    return NextResponse.json({
       success: false,
       message: "Email and password are required",
     });
@@ -16,7 +17,7 @@ export async function POST(request) {
 
   const user = await User.findOne({ email });
   if (!user) {
-    return Response.json({ user: false, message: "User not found" });
+    return NextResponse.json({ user: false, message: "User not found" });
   }
 
   const userfound = bcrypt.compareSync(password, user.password);
@@ -26,8 +27,8 @@ export async function POST(request) {
       { userId: user._id, email: user.email }, // typo fixed from emai → email
       "jwtsecret"
     );
-    return Response.json({ success: true, safeUser, token });
+    return NextResponse.json({ success: true, safeUser, token });
   } else {
-    return Response.json({ success: false, message: "Invalid password" });
+    return NextResponse.json({ success: false, message: "Invalid password" });
   }
 }

@@ -7,7 +7,6 @@ import Featured from "@/Components/Featured";
 import Footer from "@/Components/Footer";
 import Hero from "@/Components/Hero";
 import Navbar from "@/Components/Navbar";
-import NewsLetter from "@/Components/NewsLetter";
 import PricingSection from "@/Components/PricingSection";
 import Testimonials from "@/Components/Testimonials";
 import WhyChooseUs from "@/Components/WhyChooseUs";
@@ -52,7 +51,7 @@ export default function Home() {
           <div className="fixed inset-0 -z-10">
             <DarkVeil hueShift={1} noiseIntensity={0.019} warpAmount={2} />
           </div>
-          <Navbar />
+          {/* <Navbar /> */}
           <Hero opacity={opacity} translate={translateY} />
           <Categories />
           <Featured />
@@ -60,9 +59,8 @@ export default function Home() {
           <Testimonials />
           <CTA />
           <FAQ />
-          <NewsLetter />
           <PricingSection />
-          <Footer />
+          {/* <Footer /> */}
         </div>
       ) : (
         ""

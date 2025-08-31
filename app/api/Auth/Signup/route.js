@@ -1,13 +1,14 @@
 import { ConnectDB } from "@/Hooks/useConnectDB";
 import bcrypt from "bcryptjs";
 import User from "@/Models/User";
+import { NextResponse } from "next/server";
 
 export async function POST(request) {
   await ConnectDB();
   const { name, email, password } = await request.json();
 
   if (!name || !email || !password) {
-    return Response.json({
+    return NextResponse.json({
       success: false,
       message: "All fields are required",
     });
@@ -15,7 +16,7 @@ export async function POST(request) {
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    return Response.json({ exists: true, message: "User already exists" });
+    return NextResponse.json({ exists: true, message: "User already exists" });
   }
 
   const hash = bcrypt.hashSync(password, 10);
@@ -29,5 +30,5 @@ export async function POST(request) {
 
   await u.save();
 
-  return Response.json({ user: u, success: true });
+  return NextResponse.json({ user: u, success: true });
 }

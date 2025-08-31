@@ -1,5 +1,6 @@
 import { ConnectDB } from "@/Hooks/useConnectDB";
 import Courses from "@/Models/Courses";
+import { NextResponse } from "next/server";
 
 export async function DELETE(request, { params }) {
   await ConnectDB();
@@ -7,18 +8,18 @@ export async function DELETE(request, { params }) {
 
   const course = await Courses.findById(courseId);
   if (!course) {
-    return Response.json({ error: "Course not found" });
+    return NextResponse.json({ error: "Course not found" });
   }
 
   const chapterToDelete = course.chapters.id(chapterId);
   if (!chapterToDelete) {
-    return Response.json({ error: "Chapter not found" });
+    return NextResponse.json({ error: "Chapter not found" });
   }
 
   chapterToDelete.deleteOne();
   await course.save();
 
-  return Response.json({ success: true, deletedChapter: chapterToDelete });
+  return NextResponse.json({ success: true, deletedChapter: chapterToDelete });
 }
 
 export async function GET(request, { params }) {
@@ -27,7 +28,7 @@ export async function GET(request, { params }) {
 
   const course = await Courses.findById(courseId).lean();
   if (!course) {
-    return Response.json({ error: "Course not found" }, { status: 404 });
+    return NextResponse.json({ error: "Course not found" }, { status: 404 });
   }
 
   const chapterToSearch = course.chapters.find(
@@ -35,10 +36,10 @@ export async function GET(request, { params }) {
   );
 
   if (!chapterToSearch) {
-    return Response.json({ error: "Chapter not found" }, { status: 404 });
+    return NextResponse.json({ error: "Chapter not found" }, { status: 404 });
   }
 
-  return Response.json({ course, chapterToSearch });
+  return NextResponse.json({ course, chapterToSearch });
 }
 
 export async function PUT(request, { params }) {
@@ -48,12 +49,12 @@ export async function PUT(request, { params }) {
 
   const course = await Courses.findById(courseId);
   if (!course) {
-    return Response.json({ error: "Course not found" });
+    return NextResponse.json({ error: "Course not found" });
   }
 
   const chapterToUpdate = course.chapters.id(chapterId);
   if (!chapterToUpdate) {
-    return Response.json({ error: "Chapter not found" });
+    return NextResponse.json({ error: "Chapter not found" });
   }
 
   chapterToUpdate.title = body.title;
@@ -61,5 +62,5 @@ export async function PUT(request, { params }) {
 
   await course.save();
 
-  return Response.json({ updatedChapter: chapterToUpdate });
+  return NextResponse.json({ updatedChapter: chapterToUpdate });
 }

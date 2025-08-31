@@ -1,5 +1,6 @@
 import { ConnectDB } from "@/Hooks/useConnectDB";
 import Courses from "@/Models/Courses";
+import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
   await ConnectDB();
@@ -7,7 +8,7 @@ export async function GET(request, { params }) {
 
   const getCourse = await Courses.findById(courseId).lean();
   if (!getCourse) {
-    return Response.json({ error: "Course not found" }, { status: 404 });
+    return NextResponse.json({ error: "Course not found" }, { status: 404 });
   }
 
   // Manually find chapter (no `.id()` on plain objects)
@@ -16,12 +17,12 @@ export async function GET(request, { params }) {
   );
 
   if (!chapter) {
-    return Response.json({ error: "Chapter not found" }, { status: 404 });
+    return NextResponse.json({ error: "Chapter not found" }, { status: 404 });
   }
 
   const getSubChapters = chapter.subChapters || [];
 
-  return Response.json({ ALLSUBCHAPTER: getSubChapters });
+  return NextResponse.json({ ALLSUBCHAPTER: getSubChapters });
 }
 
 export async function POST(request, { params }) {
@@ -31,12 +32,12 @@ export async function POST(request, { params }) {
 
   const fetchcourse = await Courses.findById(courseId);
   if (!fetchcourse) {
-    return Response.json({ error: "Course not found" });
+    return NextResponse.json({ error: "Course not found" });
   }
 
   const fetch_ch = fetchcourse.chapters.id(chapterId);
   if (!fetch_ch) {
-    return Response.json({ error: "Chapter not found" });
+    return NextResponse.json({ error: "Chapter not found" });
   }
 
   const sub_chapter_data = {
@@ -47,5 +48,5 @@ export async function POST(request, { params }) {
   fetch_ch.subChapters.push(sub_chapter_data);
   await fetchcourse.save();
 
-  return Response.json({ success: true, updatedCourse: fetchcourse });
+  return NextResponse.json({ success: true, updatedCourse: fetchcourse });
 }

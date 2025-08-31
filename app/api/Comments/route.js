@@ -1,5 +1,6 @@
 import { ConnectDB } from "@/Hooks/useConnectDB";
 import Comments from "@/Models/Comments";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
   await ConnectDB();
@@ -13,7 +14,7 @@ export async function POST(req) {
   });
 
   await comment.save();
-  return Response.json({ success: true, comment });
+  return NextResponse.json({ success: true, comment });
 }
 
 export async function GET(req) {
@@ -29,5 +30,5 @@ export async function GET(req) {
     comments = await Comments.find(); // fallback: fetch all comments
   }
 
-  return Response.json({ success: true, comments });
+  return NextResponse.json({ success: true, comments });
 }

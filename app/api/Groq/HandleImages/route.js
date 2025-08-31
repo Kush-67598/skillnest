@@ -1,4 +1,5 @@
 // /app/api/Groq/HandleImages/route.js
+import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 export async function POST(req) {
@@ -40,13 +41,13 @@ Question: ${question}
       ],
     });
 
-    return new Response(
+    return new NextResponse(
       JSON.stringify({ result: completion.choices[0].message.content }),
       { status: 200 }
     );
   } catch (err) {
     console.error(err);
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new NextResponse(JSON.stringify({ error: err.message }), {
       status: 500,
     });
   }

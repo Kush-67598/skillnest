@@ -1,6 +1,7 @@
 import { ConnectDB } from "@/Hooks/useConnectDB";
 import User from "@/Models/User";
 import bcrypt from "bcryptjs";
+import { NextResponse } from "next/server";
 
 export async function POST(request) {
   try {
@@ -9,7 +10,7 @@ export async function POST(request) {
     const { email, finalPass } = await request.json();
 
     if (!email || !finalPass) {
-      return Response.json(
+      return NextResponse.json(
         { success: false, message: "All fields are required" },
         { status: 400 }
       );
@@ -17,7 +18,7 @@ export async function POST(request) {
 
     let user = await User.findOne({ email });
     if (!user) {
-      return Response.json(
+      return NextResponse.json(
         { success: false, message: "User not found" },
         { status: 404 }
       );
@@ -28,13 +29,13 @@ export async function POST(request) {
     user.password = hashedPassword;
     await user.save();
 
-    return Response.json(
+    return NextResponse.json(
       { success: true, message: "Password updated successfully" },
       { status: 200 }
     );
   } catch (err) {
     console.error(err);
-    return Response.json(
+    return NextResponse.json(
       { success: false, message: "Internal Server Error" },
       { status: 500 }
     );

@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { NextResponse } from "next/server";
 export async function POST() {
   const timestamp = Math.round(new Date().getTime() / 1000);
 
@@ -7,7 +8,7 @@ export async function POST() {
     .createHash("sha1")
     .update(paramsToSign + process.env.CLOUDINARY_API_SECRET)
     .digest("hex");
-  return new Response(
+  return new NextResponse(
     JSON.stringify({
       signature,
       timestamp,

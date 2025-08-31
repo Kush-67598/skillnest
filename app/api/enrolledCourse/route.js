@@ -2,6 +2,7 @@ import User from "@/Models/User";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import TrackCourse from "@/Models/TrackCourse";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
   try {
@@ -11,7 +12,7 @@ export async function POST(req) {
     const { courseId } = await req.json();
 
     if (!mongoose.Types.ObjectId.isValid(courseId)) {
-      return Response.json(
+      return NextResponse.json(
         { success: false, message: "Invalid courseId" },
         { status: 400 }
       );
@@ -19,7 +20,7 @@ export async function POST(req) {
 
     const u = await User.findOne({ email });
     if (!u) {
-      return Response.json(
+      return NextResponse.json(
         { success: false, message: "User not found" },
         { status: 404 }
       );
@@ -43,10 +44,10 @@ export async function POST(req) {
       });
     }
 
-    return Response.json({ success: true });
+    return NextResponse.json({ success: true });
   } catch (err) {
     console.error(err);
-    return Response.json(
+    return NextResponse.json(
       { success: false, message: "Server error" },
       { status: 500 }
     );
@@ -61,15 +62,15 @@ export async function GET(req) {
     const u = await User.findOne({ email }).populate("courses"); // populate to get course details
 
     if (!u)
-      return Response.json(
+      return NextResponse.json(
         { success: false, message: "User not found" },
         { status: 404 }
       );
 
-    return Response.json({ success: true, courses: u.courses });
+    return NextResponse.json({ success: true, courses: u.courses });
   } catch (err) {
     console.error(err);
-    return Response.json(
+    return NextResponse.json(
       { success: false, message: "Server error" },
       { status: 500 }
     );

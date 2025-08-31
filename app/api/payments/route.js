@@ -1,4 +1,5 @@
 import User from "@/Models/User";
+import { NextResponse } from "next/server";
 import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils";
 
 export async function POST(req) {
@@ -11,13 +12,13 @@ export async function POST(req) {
     process.env.KEY_SECRET
   );
   if (!validate) {
-    return Response.json(
+    return NextResponse.json(
       { success: false, message: "Payment Verification Failed" },
       { status: 400 }
     );
   }
 
-  return Response.json({
+  return NextResponse.json({
     success: true,
     message: "Payment verified successfully",
     data: {

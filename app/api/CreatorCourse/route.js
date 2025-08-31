@@ -2,6 +2,7 @@ import { ConnectDB } from "@/Hooks/useConnectDB";
 import Creator from "@/Models/Creator";
 import Courses from "@/Models/Courses";
 import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server";
 
 export async function GET(req) {
   await ConnectDB();
@@ -11,7 +12,7 @@ export async function GET(req) {
     email: creator_email,
   }).populate("courses");
 
-  return Response.json({
+  return NextResponse.json({
     Creator_courses: creatorCourses,
   });
 }
