@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils";
 
 export async function POST(req) {
-  const { razorpay_payment_id, razorpay_order_id, razorpay_signature, email } =
+  const { razorpay_payment_id, razorpay_order_id, razorpay_signature } =
     await req.json();
 
   const validate = validatePaymentVerification(

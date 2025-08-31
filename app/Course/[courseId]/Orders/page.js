@@ -67,7 +67,12 @@ export default function OrderPage({ params }) {
         fetch(`${process.env.NEXT_PUBLIC_API}/api/payments`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ response: response, email }),
+          body: JSON.stringify({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            email: email, // from your component state
+          }),
         });
       },
       prefill: {
