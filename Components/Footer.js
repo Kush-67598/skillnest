@@ -40,13 +40,13 @@ const Footer = () => {
         <div>
           <h4 className="font-semibold mb-2">Follow Us</h4>
           <div className="flex space-x-4">
-            <a href="https://github.com/Kush-67598">
+            <a target="_blank" href="https://github.com/Kush-67598">
               <FaGithub size={20} />
             </a>
-            <a href="https://linkedin.com/in/kush-kumar-singh-623804340">
+            <a target="_blank" href="https://linkedin.com/in/kush-kumar-singh-623804340">
               <FaLinkedin size={20} />
             </a>
-            <a href="https://x.com/Kush67598">
+            <a target="_blank" href="https://x.com/Kush67598">
               <SiX size={20} />
             </a>
           </div>

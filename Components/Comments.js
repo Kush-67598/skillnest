@@ -126,13 +126,33 @@ const CommentItem = ({
 };
 
 export default function CommentsPage({ course }) {
-  const [author, setAuthor] = useState("");
+  const [author, setAuthor] = useState(""); // will be username from API
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState([]);
 
-  const [openComments, setOpenComments] = useState({}); // track multiple expanded
-  const [replyingTo, setReplyingTo] = useState({}); // track multiple reply boxes
+  const [openComments, setOpenComments] = useState({});
+  const [replyingTo, setReplyingTo] = useState({});
   const [replyTexts, setReplyTexts] = useState({});
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/User", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("USER_TOKEN")}`,
+          },
+        });
+        const response = await res.json();
+        if (response?.name) {
+          setAuthor(response.name);
+        }
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const fetchComments = async () => {
     try {
@@ -160,7 +180,7 @@ export default function CommentsPage({ course }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           text: textToSend,
-          author,
+          author, // comes from API now
           parentId,
           courseId: course._id,
         }),
@@ -180,11 +200,11 @@ export default function CommentsPage({ course }) {
       {/* Top-level comment */}
       <div className="flex justify-center mb-6 space-x-2">
         <div className="flex flex-col items-center justify-center my-4">
+          {/* Username auto-filled from API */}
           <input
             type="text"
-            placeholder="Your Name"
             value={author}
-            onChange={(e) => setAuthor(e.target.value)}
+            readOnly
             className="p-2 lg:w-[90vw] w-[20rem] rounded-md my-3 bg-gray-700 text-white placeholder-gray-400"
           />
           <textarea

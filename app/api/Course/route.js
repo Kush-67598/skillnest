@@ -2,6 +2,7 @@ import { ConnectDB } from "@/Hooks/useConnectDB";
 import Courses from "@/Models/Courses";
 import Creator from "@/Models/Creator";
 import jwt from "jsonwebtoken";
+import Redis from "../../utils/Redis";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
@@ -35,11 +36,19 @@ export async function POST(request) {
 }
 
 export async function GET(req) {
+  // const value = await Redis.get("foo");
+  // console.log("value iS:",value);
   await ConnectDB();
   const url = new URL(req.url);
   const page = parseInt(url.searchParams.get("page") || "0");
   const limit = 4;
   const skip = page * limit;
+  const cacheKey = `courses_page_${page}`;
+  const cached = await Redis.get(cacheKey);
+  if (cached) {
+    console.log("Serving from Redis cache:", cacheKey);
+    return NextResponse.json({ allCourses: JSON.parse(cached) });
+  }
   const allCourses = await Courses.find()
     .populate("creator", "creatorName")
     .skip(skip)
@@ -47,5 +56,6 @@ export async function GET(req) {
     .lean(); // only return name and email
 
   if (!allCourses) return NextResponse.json({ error: "No Courses Found" });
+  await Redis.set(cacheKey, JSON.stringify(allCourses), { EX: 60000 });
   return NextResponse.json({ allCourses: allCourses });
 }

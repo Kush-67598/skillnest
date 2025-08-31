@@ -34,7 +34,7 @@ const PricingSection = () => {
             <li>📦 Access to exclusive projects & templates</li>
           </ul>
           <div className="mt-auto">
-            <span className="text-2xl font-bold">₹499 / month</span>
+            <span className="text-2xl font-bold line-through">₹499 / month </span><span className="text-2xl font-bold">₹ 0</span>
             <button className="mt-4 w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition">
               Upgrade Now
             </button>

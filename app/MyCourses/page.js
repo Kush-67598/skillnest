@@ -100,15 +100,15 @@ export default function MyCoursesPage() {
                   className="bg-gradient-to-br from-gray-800 via-gray-900 to-black border border-gray-700 rounded-3xl shadow-xl p-6 flex flex-col justify-between"
                 >
                   <div>
-                    <h2 className="text-xl font-bold text-white line-clamp-2 mb-2">
+                    <h2 className="text-xl py-2 font-bold text-white line-clamp-2 mb-2">
                       {course.title}
                     </h2>
-                    <p className="text-gray-300 text-sm line-clamp-3 mb-4">
+                    <p className="text-gray-300 py-2 text-sm line-clamp-3 mb-4">
                       {course.description}
                     </p>
 
                     {/* Progress */}
-                    <div className="h-3 bg-gray-700 rounded-full overflow-hidden mb-2">
+                    {/* <div className="h-3 bg-gray-700 rounded-full overflow-hidden mb-2">
                       <div
                         className="h-full bg-gradient-to-r from-green-400 via-green-500 to-green-600 transition-all duration-500"
                         style={{ width: `${progress}%` }}
@@ -116,12 +116,12 @@ export default function MyCoursesPage() {
                     </div>
                     <p className="text-xs text-gray-400 mb-4">
                       {progress}% completed
-                    </p>
+                    </p> */}
                   </div>
 
                   <button
                     onClick={() => router.push(continueUrl)}
-                    className="mt-auto w-full py-2 bg-gradient-to-r from-purple-900 via-slate-500 to-purple-300 text-white font-semibold rounded-xl shadow-lg hover:scale-105 transition-transform duration-300"
+                    className="  w-full py-3 my-4 bg-gradient-to-r from-purple-900 via-slate-500 to-purple-300 text-white font-semibold rounded-xl shadow-lg hover:scale-105 transition-transform duration-300"
                   >
                     ▶ Continue
                   </button>

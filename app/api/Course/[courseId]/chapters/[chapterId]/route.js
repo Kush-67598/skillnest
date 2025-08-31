@@ -21,16 +21,25 @@ export async function DELETE(request, { params }) {
 
   return NextResponse.json({ success: true, deletedChapter: chapterToDelete });
 }
-
 export async function GET(request, { params }) {
   await ConnectDB();
   const { courseId, chapterId } = params;
+  const cacheKey = `Course_${courseId}_chapter_${chapterId}`;
 
+  // 1️⃣ Check cache first
+  const cached = await Redis.get(cacheKey);
+  if (cached) {
+    const chapterToSearch = JSON.parse(cached);
+    return NextResponse.json({ chapterToSearch });
+  }
+
+  // 2️⃣ Fetch course from DB if not cached
   const course = await Courses.findById(courseId).lean();
   if (!course) {
     return NextResponse.json({ error: "Course not found" }, { status: 404 });
   }
 
+  // 3️⃣ Find the specific chapter
   const chapterToSearch = course.chapters.find(
     (chap) => chap._id.toString() === chapterId
   );
@@ -39,8 +48,12 @@ export async function GET(request, { params }) {
     return NextResponse.json({ error: "Chapter not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ course, chapterToSearch });
+  // 4️⃣ Cache the chapter in Redis (expire in 1 day)
+  await Redis.set(cacheKey, JSON.stringify(chapterToSearch), { EX: 86400 });
+
+  return NextResponse.json({ chapterToSearch });
 }
+
 
 export async function PUT(request, { params }) {
   await ConnectDB();

@@ -34,6 +34,7 @@
     "react-spinners": "^0.17.0",
     "react-syntax-highlighter": "^15.6.1",
     "react-toastify": "^11.0.5",
+    "redis": "^5.8.2",
     "styled-system": "^5.1.5",
     "three": "^0.167.1"
   },

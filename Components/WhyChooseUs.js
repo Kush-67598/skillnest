@@ -92,7 +92,7 @@ const WhyChooseUs = () => {
               showTooltip={true}
               displayOverlayContent={true}
               overlayContent={
-                <div className="tilted-card-demo-text p-2 lg:h-[40vh] h-[30vh] rounded-xl bg-gradient-to-br from-purple-900 via-black to-purple-500 text-white">
+                <div className="tilted-card-demo-text p-2 lg:h-[40vh] h-[30vh] rounded-xl bg-gradient-to-br from-purple-300 via-black to-purple-950 text-white">
                   <p className="lg:text-3xl text-2xl mt-2 lg:pb-10">
                     {item.captionText}
                   </p>

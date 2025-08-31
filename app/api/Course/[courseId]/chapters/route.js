@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET(request, { params }) {
   await ConnectDB();
   const { courseId } = params;
+  
   const getCourse = await Courses.findById(courseId).lean();
   if (!getCourse) {
     return NextResponse.json({ error: "Course not found" });

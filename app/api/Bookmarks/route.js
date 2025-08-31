@@ -8,6 +8,7 @@ export async function POST(req) {
   try {
     // 1. Decode token
     const user = getAuthUser(req);
+    console.log(user);
     if (!user) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
@@ -16,7 +17,7 @@ export async function POST(req) {
     }
 
     // 2. Verify user exists
-    const legit_user = await User.findById(user.user_id);
+    const legit_user = await User.findById(user.userId);
     if (!legit_user) {
       return NextResponse.json(
         { success: false, error: "User not found" },

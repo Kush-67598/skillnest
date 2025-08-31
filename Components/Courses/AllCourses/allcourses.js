@@ -3,25 +3,33 @@ import { useRouter } from "next/navigation";
 import { FaBookmark } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
+import Loader from "@/Components/Loader/loader";
 
 export default function CourseCard({ course }) {
   const router = useRouter();
   const [bookmarks, setBookmarks] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetch_Bookmarks = async (courseId) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Bookmarks`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("USER_TOKEN")}`,
-        },
-        body: JSON.stringify({ courseId }),
-      });
+      setLoading(true);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API}/api/Bookmarks`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("USER_TOKEN")}`,
+          },
+          body: JSON.stringify({ courseId }),
+        }
+      );
+      setLoading(false);
       const res = await response.json();
       if (res.success) {
         setTimeout(() => {
-          setBookmarks((prev) => {
+          setBookmarks((prev = []) => {
+            // <-- default to empty array
             if (prev.some((item) => item._id === courseId)) {
               toast.info("Bookmark Removed", {
                 autoClose: 1000,
@@ -32,6 +40,7 @@ export default function CourseCard({ course }) {
               toast.success("Bookmark Added", {
                 autoClose: 1000,
                 toastId: `bm-${courseId}`,
+                hideProgressBar:true
               });
               return [...prev, { _id: courseId }];
             }
@@ -40,6 +49,8 @@ export default function CourseCard({ course }) {
       }
     } catch (err) {
       console.error(err);
+    }finally{
+      setLoading(false)
     }
   };
 
@@ -63,6 +74,8 @@ export default function CourseCard({ course }) {
   }
 
   return (
+    <>
+    {loading && <Loader/>}
     <div
       key={course._id}
       onClick={() => router.push(`/Course/${course._id}`)}
@@ -114,5 +127,6 @@ export default function CourseCard({ course }) {
         </p>
       </div>
     </div>
+    </>
   );
 }

@@ -15,7 +15,7 @@ export default function Loader({ message }) {
         wrapperClass=""
       />
       
-      {message && <p className="mt-2 text-sm text-gray-600">{message}</p>}
+      {message && <p className="mt-2 text-sm text-white">{message}</p>}
     </div>
   );
 }

@@ -2,8 +2,13 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import CommentsPage from "@/Components/Comments";
+import Loader from "@/Components/Loader/loader";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function SingleCourseCard({ course }) {
+  const [loading, setLoading] = useState(false);
+
   const Count_chapter = course.chapters.length;
   let countSubchapters = 0;
   let countLessons = 0;
@@ -27,37 +32,51 @@ export default function SingleCourseCard({ course }) {
 
   const handleEnroll = async () => {
     if (!token) {
-      alert("Please login to enroll in the course.");
+      toast.warn("Please login to enroll in the course.");
       return;
     }
 
+    setLoading(true); // start loading
+
     if (course.price && course.price !== 0) {
       router.push(`/Course/${course._id}/Orders`);
-    } else {
-      try {
-        const enrolledcourse = await fetch(
-          `${process.env.NEXT_PUBLIC_API}/api/enrolledCourse`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ courseId: course._id }),
-          }
-        );
-        const res = await enrolledcourse.json();
-        if (!enrolledcourse.ok)
-          throw new Error(res.message || "Failed to enroll");
-        router.push(`/Course/${course._id}/chapters`);
-      } catch (err) {
-        alert(err.message);
-      }
+      setLoading(false);
+      return;
     }
+
+    try {
+      const enrolledcourse = await fetch(
+        `${process.env.NEXT_PUBLIC_API}/api/enrolledCourse`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ courseId: course._id }),
+        }
+      );
+
+      const res = await enrolledcourse.json();
+
+      if (!enrolledcourse.ok)
+        throw new Error(res.message || "Failed to enroll");
+
+      toast.success("Enrolled successfully!", {
+        pauseOnHover: false,
+        autoClose: 1000,hideProgressBar:true
+      });
+      router.push(`/Course/${course._id}/chapters`);
+    } catch (err) {
+      toast.error(err.message);
+      setLoading(false); // stop loading
+    } 
   };
 
   return (
     <div className="w-full mx-auto p-10 border border-gray-700 rounded-3xl shadow-xl hover:shadow-2xl transition-shadow duration-300 mt-10 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800">
+      {loading && <Loader />}
+
       {/* Course Title */}
       <h1 className="text-5xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-500 drop-shadow-lg">
         {course.title}
@@ -120,8 +139,6 @@ export default function SingleCourseCard({ course }) {
         </div>
       </div>
 
-      {/* Chapters / Hierarchical Data */}
-
       {/* Buttons */}
       <div className="flex gap-6 mt-6">
         <button
@@ -133,9 +150,14 @@ export default function SingleCourseCard({ course }) {
 
         <button
           onClick={handleEnroll}
-          className="flex-1 bg-gradient-to-r from-green-500 via-green-600 to-green-700 text-white px-6 py-3 rounded-xl hover:brightness-110 transition font-semibold shadow-md hover:shadow-lg"
+          disabled={loading}
+          className={`flex-1 ${
+            loading
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:brightness-110"
+          } text-white px-6 py-3 rounded-xl transition font-semibold shadow-md hover:shadow-lg`}
         >
-          🚀 Enroll Now
+          {loading ? "Processing..." : "🚀 Enroll Now"}
         </button>
       </div>
 

@@ -2,48 +2,76 @@
 import { useRouter } from "next/navigation";
 import { IoIosCheckmarkCircle } from "react-icons/io";
 import React, { useEffect, useState } from "react";
+import Loader from "@/Components/Loader/loader";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function SubchapterPage({ subChapters, courseId, chapterId }) {
   const router = useRouter();
   const [completed, setCompleted] = useState([]);
   const [lessonsCount, setLessonsCount] = useState({}); // subchapterId => completed lessons
+  const [loading, setLoading] = useState(false);
 
   const getCompleted = async () => {
-    const token = localStorage.getItem("USER_TOKEN");
-    const resp = await fetch(`${process.env.NEXT_PUBLIC_API}/api/check-completed?courseId=${courseId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await resp.json();
-    setCompleted(data.progress || {});
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("USER_TOKEN");
+      const resp = await fetch(
+        `${process.env.NEXT_PUBLIC_API}/api/check-completed?courseId=${courseId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await resp.json();
+      setCompleted(data.progress || {});
 
-    const counts = {};
-    subChapters.forEach((sub) => {
-      let count = 0;
-      sub.lessons.forEach((lesson) => {
-        if (data.progress?.completedLessons?.includes(lesson._id.toString()))
-          count++;
+      const counts = {};
+      subChapters.forEach((sub) => {
+        let count = 0;
+        sub.lessons.forEach((lesson) => {
+          if (data.progress?.completedLessons?.includes(lesson._id.toString()))
+            count++;
+        });
+        counts[sub._id] = count;
       });
-      counts[sub._id] = count;
-    });
-    setLessonsCount(counts);
+      setLessonsCount(counts);
+      // toast.success({pauseOnHover:false,autoClose:1000},"Progress loaded successfully!");
+    } catch (err) {
+      toast.error(err.message || "Failed to load progress");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const markSubchapterCompleted = async (subchapterId) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("USER_TOKEN");
+      await fetch(`${process.env.NEXT_PUBLIC_API}/api/check-completed`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ courseId, chapterId, subchapterId }),
+      });
+      await getCompleted();
+      toast.success("Subchapter marked completed!", {
+        pauseOnHover: false,
+        autoClose: 1000,
+      });
+    } catch (err) {
+      toast.error(err.message || "Failed to mark subchapter completed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     getCompleted();
   }, []);
 
-  const markSubchapterCompleted = async (subchapterId) => {
-    const token = localStorage.getItem("USER_TOKEN");
-    await fetch(`${process.env.NEXT_PUBLIC_API}/api/check-completed`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ courseId, chapterId, subchapterId }),
-    });
-    await getCompleted();
-  };
+  if (loading) return <Loader />; // Show loader while API requests are in progress
 
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-6 mt-10">
@@ -103,20 +131,26 @@ export default function SubchapterPage({ subChapters, courseId, chapterId }) {
             <div className="flex sm:flex-col items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
               <button
                 onClick={async () => {
-                  await fetch("/api/track-progress", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${localStorage.getItem(
-                        "USER_TOKEN"
-                      )}`,
-                    },
-
-                    body: JSON.stringify({ courseId, subchapterId: sub._id }),
-                  });
-                  router.push(
-                    `/Course/${courseId}/chapters/${chapterId}/subchapters/${sub._id}/lessons`
-                  );
+                  setLoading(true);
+                  try {
+                    await fetch("/api/track-progress", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem(
+                          "USER_TOKEN"
+                        )}`,
+                      },
+                      body: JSON.stringify({ courseId, subchapterId: sub._id }),
+                    });
+                    // toast.success({pauseOnHover:false,autoClose:1000},"Tracking updated!");
+                    router.push(
+                      `/Course/${courseId}/chapters/${chapterId}/subchapters/${sub._id}/lessons`
+                    );
+                  } catch (err) {
+                    toast.error(err.message || "Failed to track progress");
+                    setLoading(false)
+                  } 
                 }}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-4 py-2 rounded-lg text-sm font-medium w-full sm:w-auto transition-all duration-200 shadow-md hover:shadow-lg"
               >
