@@ -14,6 +14,7 @@ import {
   FaUserEdit,
 } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import Loader from "./Loader/loader";
 
 export default function ProfilePage({ user }) {
   const [POTDData, setPOTDData] = useState({
@@ -21,15 +22,17 @@ export default function ProfilePage({ user }) {
     Answer: "",
     Difficulty: "",
   });
-  const [UserData, setUserData] = useState([]);
+  const [UserData, setUserData] = useState({});
   useEffect(() => {
     const userFetch = async () => {
+      if (!localStorage.getItem("USER_TOKEN")) return; // avoid bad fetch
       const response = await fetch("/api/User", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("USER_TOKEN")}`,
         },
       });
       const res = await response.json();
+
       setUserData(res.POTD);
     };
     userFetch();
@@ -42,8 +45,10 @@ export default function ProfilePage({ user }) {
   const router = useRouter();
 
   const POTDGROQ = async () => {
+    setLoading(true);
     const response = await fetch("/api/Groq/POTDQuestion", { method: "POST" });
     const res = await response.json();
+    setLoading(false);
     const newData = {
       Question: res.data.Question,
       Answer: res.data.Answer,
@@ -104,13 +109,20 @@ export default function ProfilePage({ user }) {
       headers: { "Content-Type": "application/json" },
     });
   };
+  const messages = [
+    "Excited for Question 🥳. Coming just in time!",
+    "Sharpen your brain! 🧠 Loading...",
+    "Your daily challenge awaits… ⏳",
+    "Get ready! A new question is on its way… 🚀",
+  ];
 
   return (
     <>
+      {loading && (
+        <Loader message={messages[Math.floor(Math.random()*messages.length)]} />
+      )}
       <ToastContainer />
-      {UserData.length === 0 && (
-        <div className="text-white">Loading...</div>
-      )}{" "}
+
       <div className="min-h-screen bg-gradient-to-tr from-gray-950 via-gray-900 to-black text-white px-6 py-10 flex justify-center">
         <div className="w-full max-w-5xl grid md:grid-cols-3 gap-8">
           {/* Left Profile Section */}

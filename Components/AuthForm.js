@@ -11,29 +11,29 @@ export default function AuthForm({ type }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-useEffect(() => {
-  window.google_response = async (response) => {
-    try {
-      const res = await fetch("/api/Auth/Google", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ credential: response.credential }),
-      });
+  useEffect(() => {
+    window.google_response = async (response) => {
+      try {
+        const res = await fetch("/api/Auth/Google", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ credential: response.credential }),
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (data.success) {
-        localStorage.setItem("USER_TOKEN", data.token);
-        toast.success("Logged in with Google!", { autoClose: 1200 });
-        router.push("/");
-      } else {
-        toast.error(data.error || "Google login failed");
+        if (data.success) {
+          localStorage.setItem("USER_TOKEN", data.token);
+          toast.success("Logged in with Google!", { autoClose: 1200 });
+          router.push("/");
+        } else {
+          toast.error(data.error || "Google login failed");
+        }
+      } catch (err) {
+        toast.error("Something went wrong");
       }
-    } catch (err) {
-      toast.error("Something went wrong");
-    }
-  };
-}, []);
+    };
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("USER_TOKEN");
@@ -55,18 +55,24 @@ useEffect(() => {
           ? JSON.stringify({ email, password })
           : JSON.stringify({ name, email, password });
 
-      const response = await fetch(endpoint, { method: "POST", body });
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }, // add this
+        body,
+      });
       const res = await response.json();
 
       if (res.success) {
-        localStorage.setItem("USER_TOKEN", res.token);
-        toast.success(
-          type === "login"
-            ? "Successfully Logged In"
-            : "Account Created Successfully",
-          { autoClose: 1200 }
-        );
-        router.push(type === "login" ? "/" : "/auth/login");
+        if (type === "login") {
+          // ✅ Only set token on login
+          localStorage.setItem("USER_TOKEN", res.token);
+          toast.success("Successfully Logged In", { autoClose: 1200 });
+          router.push("/");
+        } else {
+          // ✅ On signup, just redirect to login
+          toast.success("Account Created Successfully", { autoClose: 1200 });
+          router.push("/auth/login");
+        }
       } else {
         toast.error(res.message || "Something went wrong", { autoClose: 1200 });
       }
@@ -149,7 +155,7 @@ useEffect(() => {
                 data-client_id={process.env.NEXT_PUBLIC_CLIENT_ID}
                 data-context="signin"
                 data-ux_mode="popup"
-                data-callback="google_response"  //Here Callback is your Api Route where it gets its response
+                data-callback="google_response" //Here Callback is your Api Route where it gets its response
               />
               <div className="g_id_signin" data-type="standard"></div>
             </div>

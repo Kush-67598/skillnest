@@ -17,7 +17,7 @@ Lesson details are: ${JSON.stringify(sections)}.
 Return:
 1. A summary paragraph.
 2. 5 key points.
-3. A quiz: 5 questions, each with 4 options, and the correct answer.`,
+3. A quiz: 10 questions, each with 4 options, and the correct answer.`,
         text: {
           format: {
             type: "json_schema",

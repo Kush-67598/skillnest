@@ -18,7 +18,7 @@ const UserSchema = new mongoose.Schema({
       TotalSolved: { type: Number, default: 0 },
       OverallCodingScore: { type: Number, default: 0 },
       lastSolvedDate: { type: Date, default: null },
-       expiresAt: { type: Date, required: true },
+      expiresAt: { type: Date, required: true },
     },
   ],
 
@@ -26,7 +26,9 @@ const UserSchema = new mongoose.Schema({
   bio: { type: String },
   courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
   googleId: { type: String },
-  premium: { type: String, unique: true },
+  pro: { type: Boolean, default: false }, // whether user is pro
+  proClaimedAt: { type: Date }, // when they activated
+  proExpiresAt: { type: Date },
 });
 
 export default mongoose.models.User || mongoose.model("User", UserSchema);

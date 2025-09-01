@@ -20,6 +20,8 @@ export async function GET(req) {
     email: u.email,
     profileImg: u.profileImg || "",
     POTD: u.POTD,
+    googleId: u.googleId,
+    pro:u.pro,
     success: true,
   });
 }
@@ -27,6 +29,28 @@ export async function GET(req) {
 export async function POST(req) {
   await ConnectDB();
   const authtoken = req.headers.get("authorization")?.split(" ")[1];
-  const user_email = jwt.verify(authtoken, "jwtsecret").email;
-  const u = await User.findOne({ email: user_email });
+  if (!authtoken) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const verified_user = getAuthUser(req);
+    const u = await User.findOne({ email: verified_user.email });
+    if (!u) {
+      return NextResponse.json({ message: "User Not Found" }, { status: 404 });
+    }
+
+    u.pro = true;
+    u.proClaimedAt = new Date();
+    await u.save();
+
+    return NextResponse.json({
+      message: "Pro activated successfully!",
+      pro: true,
+      success: true,
+    });
+  } catch (err) {
+    console.error("Error in claim-pro:", err);
+    return NextResponse.json({ message: "Invalid token" }, { status: 400 });
+  }
 }

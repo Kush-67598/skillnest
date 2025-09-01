@@ -32,13 +32,21 @@ const WhyChooseUs = () => {
     },
   ];
 
+  // Unique neon gradients for each card
+  const gradients = [
+    "bg-gradient-to-br from-[#3B82F6] via-[#0A0A0A] to-[#0F172A] shadow-lg shadow-blue-800/40",
+    "bg-gradient-to-br from-[#06B6D4] via-[#0A0A0A] to-[#0F172A] shadow-lg shadow-cyan-800/40",
+    "bg-gradient-to-br from-[#9333EA] via-[#0A0A0A] to-[#0F172A] shadow-lg shadow-purple-800/40",
+    "bg-gradient-to-br from-[#EC4899] via-[#0A0A0A] to-[#0F172A] shadow-lg shadow-pink-800/40",
+  ];
+
   const isMobile = useCheckView();
   const ref = useRef(null);
 
   // Scroll progress for the section
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start end", "end start"], // animation from entering to leaving
+    offset: ["start end", "end start"],
   });
 
   // Map scroll progress to opacity and Y movement
@@ -92,7 +100,12 @@ const WhyChooseUs = () => {
               showTooltip={true}
               displayOverlayContent={true}
               overlayContent={
-                <div className="tilted-card-demo-text p-2 lg:h-[40vh] h-[30vh] rounded-xl bg-gradient-to-br from-purple-300 via-black to-purple-950 text-white">
+                <div
+                  className={`tilted-card-demo-text p-2 lg:h-[40vh] h-[30vh] rounded-xl backdrop-blur-2xl 
+                  transition-all duration-300 hover:scale-105 hover:border hover:border-white/20
+                  ${gradients[index]}
+                  `}
+                >
                   <p className="lg:text-3xl text-2xl mt-2 lg:pb-10">
                     {item.captionText}
                   </p>

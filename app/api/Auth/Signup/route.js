@@ -26,6 +26,8 @@ export async function POST(request) {
     email: email,
     password: hash,
     profileImg: "",
+    bio: "",
+    username:''
   });
 
   await u.save();

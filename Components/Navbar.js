@@ -1,15 +1,33 @@
 "use client";
-
 import Link from "next/link";
 import { FaUser, FaBars, FaTimes } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Navbar = () => {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userPlan, setUserPlan] = useState("Free");
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/User", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("USER_TOKEN")}`,
+          },
+        });
+        const data = await res.json();
+        console.log(data);
+        if (data?.pro === true) setUserPlan("Pro");
+      } catch (err) {
+        console.log("User fetch error", err);
+      }
+    };
+    fetchUser();
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-black/50 border-b border-white/10 shadow-lg">
@@ -23,7 +41,10 @@ const Navbar = () => {
 
         {/* Desktop Links */}
         <ul className="hidden md:flex gap-8 text-sm font-medium text-white/90">
-          {["Home", "About", "Contact", "Course", "MyCourses"].map((link) => (
+          <Link href={"/"}>Home</Link>
+          <a href="/Course">Course</a>
+
+          {["About", "Contact", "MyCourses"].map((link) => (
             <li key={link}>
               <Link
                 href={`/${link === "Home" ? "" : link}`}
@@ -36,14 +57,22 @@ const Navbar = () => {
         </ul>
 
         {/* User Profile */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <div
             onClick={() => router.push("/Profile")}
-            className="p-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 hover:scale-110 transition-transform cursor-pointer shadow-lg"
+            className="p-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 hover:scale-110 transition-transform cursor-pointer shadow-lg flex items-center gap-2"
           >
             <FaUser className="text-white text-lg" />
-          </div>
-
+          </div>{" "}
+          <span
+            className={`text-xs font-semibold px-2 py-1 rounded ${
+              userPlan === "Pro"
+                ? "bg-red-500 text-black"
+                : "bg-green-400 text-black"
+            }`}
+          >
+            {userPlan}
+          </span>
           {/* Mobile Menu Button */}
           <div
             className="md:hidden text-white cursor-pointer"

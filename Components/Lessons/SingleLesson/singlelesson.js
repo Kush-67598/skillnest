@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import Loader from "@/Components/Loader/loader";
 import Image from "next/image";
+import { toast } from "react-toastify";
 
 export default function SingleLesson({
   lesson,
@@ -30,18 +31,34 @@ export default function SingleLesson({
     section_codeSnippet: item.codeSnippet,
   }));
 
+
   // Fetch Summary
   const fetchSummary = async () => {
     setQuizData(null);
     setGroqResponse(null);
-
     setLoadingSummary(true);
+
     try {
+      // ✅ Check user plan first
+      const userRes = await fetch("/api/User", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("USER_TOKEN")}`,
+        },
+      });
+      const userData = await userRes.json();
+
+      if (userData?.pro === false) {
+        toast.error("🚀 Upgrade to Pro to access Summaries");
+        setTimeout(() => router.push("/#pricing"), 1500); // delay so toast shows
+        return;
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Groq`, {
         method: "POST",
         body: JSON.stringify({ title: lesson.title, sections }),
       });
       const res = await response.json();
+
       if (res.success) {
         setGroqResponse(res.data);
       }
@@ -56,16 +73,31 @@ export default function SingleLesson({
   const fetchQuiz = async () => {
     setGroqResponse(null);
     setQuizData(null);
-
     setLoadingQuiz(true);
+
     try {
+      // ✅ Check user plan first
+      const userRes = await fetch("/api/User", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("USER_TOKEN")}`,
+        },
+      });
+      const userData = await userRes.json();
+
+      if (userData?.pro === false) {
+        toast.error("🚀 Upgrade to Pro to access Quizzes");
+        setTimeout(() => router.push("/#pricing"), 1500);
+        return;
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Groq`, {
         method: "POST",
         body: JSON.stringify({ title: lesson.title, sections }),
       });
       const res = await response.json();
+
       if (res.success) {
-        setQuizData(res.data.Quiz || []); // expecting Quiz array
+        setQuizData(res.data.Quiz || []);
         setSelectedAnswers({});
         setCurrentQuestion(0);
         setShowResults(false);

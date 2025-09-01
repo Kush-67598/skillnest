@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import ChromaGrid from "@/Bits/Components/ChromaGrid/ChromaGrid";
-import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 const Testimonials = () => {
@@ -16,10 +15,41 @@ const Testimonials = () => {
       gradient: "linear-gradient(145deg, #3B82F6, #000)",
       url: "https://github.com/sarahjohnson",
       content:
-        "I land my first Job. Thanks to SkillNest for Providing Such Great Courses ❤️✨",
+        "I landed my first job. Thanks to SkillNest for providing such great courses ❤️✨",
+    },
+    {
+      image: "https://i.pravatar.cc/300?img=5",
+      title: "Sarah Johnson",
+      subtitle: "UI/UX Designer",
+      handle: "@SarahJ",
+      borderColor: "#10B981",
+      gradient: "linear-gradient(145deg, #10B981, #000)",
+      url: "https://github.com/sarahjohnson",
+      content:
+        "The mentorship and community here are simply amazing. I grew a lot as a designer 🚀",
+    },
+    {
+      image: "https://i.pravatar.cc/300?img=10",
+      title: "Aman Verma",
+      subtitle: "Data Scientist",
+      handle: "@AmanV",
+      borderColor: "#F59E0B",
+      gradient: "linear-gradient(145deg, #F59E0B, #000)",
+      url: "https://github.com/amanverma",
+      content:
+        "Courses are hands-on and project-based. This is what made me confident in real-world work.",
     },
   ];
 
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // ✅ Auto-slide every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % items.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [items.length]);
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -50,20 +80,33 @@ const Testimonials = () => {
         Trusted by passionate developers and creators worldwide.
       </motion.p>
 
+      {/* Show only active testimonial */}
       <motion.div style={{ y: translateY }}>
-        <ChromaGrid items={items} radius={400} damping={0.45} fadeOut={0.6} ease="power3.out" />
+        <ChromaGrid
+          items={[items[activeIndex]]}
+          radius={400}
+          damping={0.45}
+          fadeOut={0.6}
+          ease="power3.out"
+        />
       </motion.div>
 
+      {/* Dots Pagination */}
       <motion.div
         style={{ y: translateY }}
-        className="flex items-center justify-center"
+        className="flex items-center justify-center mt-6 space-x-3"
       >
-        <button className="px-12 my-4">
-          <FaArrowAltCircleLeft className="text-6xl" />
-        </button>
-        <button className="px-12 my-4">
-          <FaArrowAltCircleRight className="text-6xl" />
-        </button>
+        {items.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setActiveIndex(idx)}
+            className={`w-4 h-4 rounded-full transition-all duration-300 ${
+              activeIndex === idx
+                ? "bg-fuchsia-500 scale-125 shadow-lg shadow-fuchsia-600/50"
+                : "bg-gray-500 hover:bg-gray-400"
+            }`}
+          ></button>
+        ))}
       </motion.div>
     </motion.div>
   );
