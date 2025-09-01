@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Script from "next/script";
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
@@ -134,7 +135,7 @@ export default function AuthForm({ type }) {
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300"
                 >
-                  {showPassword ? "Hide" : "Show"}
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}{" "}
                 </button>
               </div>
 
