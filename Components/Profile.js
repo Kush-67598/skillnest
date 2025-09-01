@@ -108,7 +108,9 @@ export default function ProfilePage({ user }) {
   return (
     <>
       <ToastContainer />
-
+      {UserData.length === 0 && (
+        <div className="text-white">Loading...</div>
+      )}{" "}
       <div className="min-h-screen bg-gradient-to-tr from-gray-950 via-gray-900 to-black text-white px-6 py-10 flex justify-center">
         <div className="w-full max-w-5xl grid md:grid-cols-3 gap-8">
           {/* Left Profile Section */}
@@ -167,6 +169,7 @@ export default function ProfilePage({ user }) {
               <h3 className="text-sm font-semibold text-gray-300 mb-4">
                 Your Progress
               </h3>
+
               {UserData.length > 0 ? (
                 UserData.map((POTD, index) => (
                   <div
@@ -196,7 +199,7 @@ export default function ProfilePage({ user }) {
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500 text-sm">No progress yet...</p>
+                <p className="text-white text-sm">No progress yet...</p>
               )}
             </div>
 

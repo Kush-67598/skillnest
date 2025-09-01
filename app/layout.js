@@ -1,5 +1,6 @@
 import { Michroma } from "next/font/google";
 import { ToastContainer } from "react-toastify";
+import AuthWrapper from "./utils/Auth_Wrapper";
 
 import "./globals.css";
 import Footer from "@/Components/Footer";
@@ -19,14 +20,17 @@ export default function RootLayout({ children }) {
   return (
     <>
       <html lang="en">
-        <body className={`${michroma.className} bg-black min-h-screen flex flex-col`}>
+        <body
+          className={`${michroma.className} bg-black min-h-screen flex flex-col`}
+        >
+          <AuthWrapper>
           <Navbar />
           <main className="pt-[4.2rem] flex-1">{children}</main>
           <ToastContainer />
           <Footer />
+        </AuthWrapper>
         </body>
       </html>
     </>
   );
 }
-
