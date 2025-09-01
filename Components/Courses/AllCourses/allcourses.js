@@ -28,8 +28,8 @@ export default function CourseCard({ course }) {
       const res = await response.json();
       if (res.success) {
         setTimeout(() => {
-          setBookmarks((prev = []) => {
-            // <-- default to empty array
+          setBookmarks((prev) => {
+            if (!prev) prev = []; // fallback if null
             if (prev.some((item) => item._id === courseId)) {
               toast.info("Bookmark Removed", {
                 autoClose: 1000,
