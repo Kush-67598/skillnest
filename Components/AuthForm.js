@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { useEffect, useState } from "react";
@@ -167,12 +168,12 @@ export default function AuthForm({ type }) {
                   ? "Don’t have an account?"
                   : "Already have an account?"}
               </p>
-              <a
+              <Link
                 href={`${type === "login" ? "/auth/signup" : "/auth/login"}`}
                 className="text-purple-400 hover:underline font-medium"
               >
                 {type === "login" ? "Sign Up" : "Login"}
-              </a>
+              </Link>
             </div>
             {type == "login" && (
               <button
