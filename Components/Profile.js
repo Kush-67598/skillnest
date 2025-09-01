@@ -119,7 +119,13 @@ export default function ProfilePage({ user }) {
   return (
     <>
       {loading && (
-        <Loader message={messages[Math.floor(Math.random()*messages.length)]} />
+        <Loader
+          message={
+            file
+              ? "Uploading Profile Picture"
+              : messages[Math.floor(Math.random() * messages.length)]
+          }
+        />
       )}
       <ToastContainer />
 
