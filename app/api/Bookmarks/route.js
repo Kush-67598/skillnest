@@ -17,7 +17,7 @@ export async function POST(req) {
     }
 
     // 2. Verify user exists
-    const legit_user = await User.findById(user.userId);
+    const legit_user = await User.findById(user.user_id);
     if (!legit_user) {
       return NextResponse.json(
         { success: false, error: "User not found" },

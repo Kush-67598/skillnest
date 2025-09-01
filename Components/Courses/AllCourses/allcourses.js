@@ -56,7 +56,7 @@ export default function CourseCard({ course }) {
 
   useEffect(() => {
     const getBookmarks = async () => {
-      const getB = await fetch(`${process.env.NEXT_PUBLIC_API}/api/Bookmarks`, {
+      const getB = await fetch(`/api/Bookmarks`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("USER_TOKEN")}`,
         },
