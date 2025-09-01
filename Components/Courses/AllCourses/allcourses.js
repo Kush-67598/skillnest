@@ -24,28 +24,31 @@ export default function CourseCard({ course }) {
           body: JSON.stringify({ courseId }),
         }
       );
-      setLoading(false);
       const res = await response.json();
       if (res.success) {
-        setTimeout(() => {
-          setBookmarks((prev) => {
-            if (!prev) prev = []; // fallback if null
-            if (prev.some((item) => item._id === courseId)) {
-              toast.info("Bookmark Removed", {
-                autoClose: 1000,
-                toastId: `bm-${courseId}`,
-              });
-              return prev.filter((item) => item._id !== courseId);
-            } else {
-              toast.success("Bookmark Added", {
-                autoClose: 1000,
-                toastId: `bm-${courseId}`,
-                hideProgressBar: true,
-              });
-              return [...prev, { _id: courseId }];
-            }
+        let updated;
+        setBookmarks((prev) => {
+          if (prev.some((item) => item._id === courseId)) {
+            updated = prev.filter((item) => item._id !== courseId);
+          } else {
+            updated = [...prev, { _id: courseId }];
+          }
+          return updated;
+        });
+
+        // run after React schedules state update
+        if (bookmarks.some((item) => item._id === courseId)) {
+          toast.info("Bookmark Removed", {
+            autoClose: 1000,
+            toastId: `bm-${courseId}`,
           });
-        }, 0);
+        } else {
+          toast.success("Bookmark Added", {
+            autoClose: 1000,
+            toastId: `bm-${courseId}`,
+            hideProgressBar: true,
+          });
+        }
       }
     } catch (err) {
       console.error(err);
@@ -85,7 +88,8 @@ export default function CourseCard({ course }) {
         className="w-full bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border border-gray-700 my-4 rounded-3xl shadow-xl cursor-pointer hover:shadow-2xl transition-shadow duration-300 relative overflow-hidden"
       >
         {/* Bookmark Icon */}
-        <div
+        <button
+          type="button"
           className={`absolute top-4 right-4 z-10 p-2 rounded-full cursor-pointer ${
             bookmarks?.some((item) => item._id == course._id)
               ? "text-yellow-400 bg-gray-800/60"
@@ -97,7 +101,7 @@ export default function CourseCard({ course }) {
           }}
         >
           <FaBookmark size={24} />
-        </div>
+        </button>
 
         {/* Card Content */}
         <div className="p-6 flex flex-col gap-3">
