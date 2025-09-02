@@ -35,8 +35,6 @@ export async function POST(request) {
 }
 
 export async function GET(req) {
-  // const value = await Redis.get("foo");
-  // console.log("value iS:",value);
   await ConnectDB();
   const url = new URL(req.url);
   const page = parseInt(url.searchParams.get("page") || "0");

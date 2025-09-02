@@ -1,16 +1,10 @@
 import { ConnectDB } from "@/Hooks/useConnectDB";
 import Courses from "@/Models/Courses";
 import { NextResponse } from "next/server";
-import Redis from '../../../../../../utils/Redis'
 
 export async function GET(request, { params }) {
   await ConnectDB();
   const { courseId, chapterId } = params;
-  const cacheKey = `Course_${courseId}_chapters_${chapterId}_subchapters`;
-  const cached=await Redis.get(cacheKey)
-  // if(cached){
-  //   return Response.json({})
-  // }
 
   const getCourse = await Courses.findById(courseId).lean();
   if (!getCourse) {

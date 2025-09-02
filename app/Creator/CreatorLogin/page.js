@@ -140,7 +140,7 @@ export default function CreatorLogin() {
 
           <div className="flex flex-col justify-center items-center gap-4 mt-6 text-sm text-gray-300">
             <p>
-              Don't have a Creator account?{" "}
+              Dont have a Creator account?{" "}
               <a
                 href="/Creator/CreatorSignup"
                 className="text-purple-400 hover:underline font-medium"

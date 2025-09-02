@@ -1,27 +1,18 @@
 import { ConnectDB } from "@/Hooks/useConnectDB";
 import Courses from "@/Models/Courses";
 import { NextResponse } from "next/server";
-import { getRedisClient } from "../../../utils/Redis";
 
 export async function GET(request, { params }) {
   await ConnectDB();
   const { courseId } = params;
 
-  const Redis = await getRedisClient();
   try {
-    const cacheKey = `Course_${courseId}`;
-    const cached = await Redis.get(cacheKey);
-    if (cached) {
-      console.log("suing cahce");
-      return NextResponse.json({ reqCourse: JSON.parse(cached) });
-    }
     const course = await Courses.findById(courseId).lean();
     if (!course) {
       return new NextResponse(JSON.stringify({ error: "Course not found" }), {
         status: 404,
       });
     }
-    await Redis.set(cacheKey, JSON.stringify(course), { EX: 86400 });
     return new NextResponse(JSON.stringify({ reqCourse: course }), {
       status: 200,
     });
