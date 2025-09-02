@@ -88,8 +88,8 @@ export default function AuthForm({ type }) {
       <ToastContainer position="top-right" theme="dark" />
 
       {!token ? (
-        <div className="min-h-screen w-full -my-20 flex items-center justify-center bg-gradient-to-br">
-          <div className="w-full max-w-7xl bg-gradient-to-br from-purple-900 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-10 text-white">
+        <div className="min-h-screen -my-20  flex items-center justify-center bg-gradient-to-br">
+          <div className="w-full max-w-full bg-gradient-to-br   from-purple-900 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-10 text-white">
             <h2 className="text-4xl font-bold text-center mb-6">
               {type === "login" ? "Welcome Back 👋" : "Create an Account 🚀"}
             </h2>
