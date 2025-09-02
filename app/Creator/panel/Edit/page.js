@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Loader from "@/Components/Loader/loader";
 import Uploader from "@/Components/Loader/UploadLoader";
 
@@ -9,8 +9,7 @@ import { ToastContainer, toast } from "react-toastify";
 
 export default function CreatorDashboard({ searchParams }) {
   const [uploading, setUploading] = useState(false);
-  const sParams = useSearchParams(); // <-- unwrap here
-  const courseId = sParams.get("courseId"); // <-- access the value
+  const courseId = React.use(searchParams).courseId;
   const router = useRouter();
   const [token, setToken] = useState("");
 
