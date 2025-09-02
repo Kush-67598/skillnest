@@ -169,7 +169,7 @@ export default function AuthForm({ type }) {
               <div className="g_id_signin" data-type="standard"></div>
             </div>
 
-            <div className="flex justify-center gap-2 text-sm mt-6 text-gray-300">
+            <div className="flex  justify-center items-center gap-2 text-sm mt-6 text-gray-300">
               <p>
                 {type === "login"
                   ? "Don’t have an account?"
@@ -181,6 +181,23 @@ export default function AuthForm({ type }) {
               >
                 {type === "login" ? "Sign Up" : "Login"}
               </Link>
+            </div>
+            <div className="text-center mt-6">
+              <p className="text-sm text-gray-300 mb-2">Creator Access:</p>
+              <div className="flex justify-center gap-4">
+                <Link
+                  href="/Creator/CreatorLogin"
+                  className="text-purple-400 hover:underline font-medium"
+                >
+                  Creator Login
+                </Link>
+                <Link
+                  href="/Creator/CreatorSignup"
+                  className="text-purple-400 hover:underline font-medium"
+                >
+                  Creator Sign Up
+                </Link>
+              </div>
             </div>
 
             {type === "login" && (
