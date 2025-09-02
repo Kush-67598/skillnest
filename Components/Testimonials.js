@@ -102,8 +102,8 @@ const Testimonials = () => {
             onClick={() => setActiveIndex(idx)}
             className={`w-4 h-4 rounded-full transition-all duration-300 ${
               activeIndex === idx
-                ? "bg-fuchsia-500 scale-125 shadow-lg shadow-fuchsia-600/50"
-                : "bg-gray-500 hover:bg-gray-400"
+                ? "bg-yellow-100 scale-125 shadow-md shadow-emerald-500/60"
+                : "bg-gray-500 hover:bg-emerald-300"
             }`}
           ></button>
         ))}

@@ -138,14 +138,23 @@ export default function CreatorLogin() {
             <div className="g_id_signin" data-type="standard"></div>
           </div>
 
-          <div className="flex justify-center gap-4 mt-6 text-sm text-gray-300">
+          <div className="flex flex-col justify-center items-center gap-4 mt-6 text-sm text-gray-300">
             <p>
-              Don’t have an account?{" "}
+              Don't have a Creator account?{" "}
               <a
                 href="/Creator/CreatorSignup"
                 className="text-purple-400 hover:underline font-medium"
               >
-                Sign Up
+                Signup
+              </a>
+            </p>
+            <p>
+              Are you a learner?{" "}
+              <a
+                href="/auth/login"
+                className="text-purple-400 hover:underline font-medium"
+              >
+                User Login
               </a>
             </p>
           </div>

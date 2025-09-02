@@ -39,7 +39,10 @@ export default function CreatorMyCourses() {
         // Ensure we store an array
         if (Array.isArray(data.Creator_courses)) {
           setAllCourses(data.Creator_courses);
-        } else if (data.Creator_courses && Array.isArray(data.Creator_courses.courses)) {
+        } else if (
+          data.Creator_courses &&
+          Array.isArray(data.Creator_courses.courses)
+        ) {
           setAllCourses(data.Creator_courses.courses);
         } else {
           setAllCourses([]);
@@ -54,6 +57,15 @@ export default function CreatorMyCourses() {
 
     fetchCourses();
   }, [router]);
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem("Token"); // creator token
+    if (!savedToken) {
+      toast.error("Please log in first!");
+      router.replace("/"); // 👈 always redirect home if no token
+      return;
+    }
+  }, []);
 
   if (loading)
     return (

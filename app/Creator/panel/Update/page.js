@@ -15,7 +15,21 @@ export default function CreatorDashboard({ searchParams }) {
   const [activeLessonId, setActiveLessonId] = useState(null);
 
   const courseId = React.use(searchParams).courseId;
+  useEffect(() => {
+    const token = localStorage.getItem("Token"); // creator token
+    if (!token) {
+      router.replace("/"); // redirect if not creator
+    }
+  }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem("Token"); // creator token
+    if (!token) {
+      router.replace("/"); // kick out
+    } else {
+      setLoading(false);
+    }
+  }, [router]);
   const fetchOne = async (courseId) => {
     try {
       const res = await fetch(
@@ -39,8 +53,11 @@ export default function CreatorDashboard({ searchParams }) {
   }, []);
 
   useEffect(() => {
-    if (token) fetchOne(courseId);
-  }, [token]);
+    if (token && courseId) {
+      fetchOne(courseId);
+    }
+  }, [token, courseId]);
+  if (!singleCourse.length) return <Loader />;
 
   return (
     <div className="text-white">
@@ -79,7 +96,9 @@ export default function CreatorDashboard({ searchParams }) {
                   className="w-full text-left px-4 py-2 font-medium flex justify-between items-center"
                 >
                   {index + 1}. {ch.title}
-                  <span className="bg-gray-600 px-2 py-1 rounded hover:bg-gray-500">{activeChapterId === ch._id ? "−" : "+"}</span>
+                  <span className="bg-gray-600 px-2 py-1 rounded hover:bg-gray-500">
+                    {activeChapterId === ch._id ? "−" : "+"}
+                  </span>
                 </button>
 
                 {activeChapterId === ch._id && (
@@ -238,7 +257,7 @@ function UpdateCourseForm({ course, token, fetchOne, setLoading, loading }) {
         value={form.thumbnailURL}
         onChange={handleChange}
         placeholder="Thumbnail URL"
-        className="w-full p-3 rounded-md bg-gray-700 placeholder-gray-400"
+        className="w-full p-3 hidden rounded-md bg-gray-700 placeholder-gray-400"
       />
       <textarea
         name="description"

@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import Script from "next/script";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 export default function CreatorSignup() {
   const router = useRouter();
@@ -34,7 +34,9 @@ export default function CreatorSignup() {
           toast.success("Logged in with Google!", { autoClose: 1200 });
           router.push("/Creator/panel/View");
         } else {
-          toast.error(data.error || "Google signup failed", { autoClose: 1500 });
+          toast.error(data.error || "Google signup failed", {
+            autoClose: 1500,
+          });
         }
       } catch (err) {
         toast.error("Something went wrong", { autoClose: 1500 });
@@ -47,14 +49,11 @@ export default function CreatorSignup() {
     setLoading(true);
 
     try {
-      const signupCreator = await fetch(
-        "/api/CreatorAuth/Signup",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
-        }
-      );
+      const signupCreator = await fetch("/api/CreatorAuth/Signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
       const res = await signupCreator.json();
       setLoading(false);
 
@@ -77,7 +76,9 @@ export default function CreatorSignup() {
       <ToastContainer position="top-right" theme="dark" />
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-indigo-900 px-4">
         <div className="w-full max-w-5xl bg-gradient-to-br from-purple-800/80 to-indigo-800/80 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 text-white">
-          <h2 className="text-3xl font-bold text-center mb-4">Creator Sign Up</h2>
+          <h2 className="text-3xl font-bold text-center mb-4">
+            Creator Sign Up
+          </h2>
           <p className="text-gray-300 text-center mb-6">
             Join as a Creator and start sharing your content.
           </p>
@@ -122,7 +123,9 @@ export default function CreatorSignup() {
               type="submit"
               disabled={loading}
               className={`w-full py-3 rounded-lg font-semibold transition ${
-                loading ? "bg-purple-400 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"
+                loading
+                  ? "bg-purple-400 cursor-not-allowed"
+                  : "bg-purple-600 hover:bg-purple-700"
               }`}
             >
               {loading ? "Creating..." : "Sign Up"}
@@ -147,14 +150,23 @@ export default function CreatorSignup() {
             <div className="g_id_signin" data-type="standard"></div>
           </div>
 
-          <div className="flex justify-center gap-4 mt-6 text-sm text-gray-300">
+          <div className="flex flex-col justify-center items-center gap-4 mt-6 text-sm text-gray-300">
             <p>
-              Already have an account?{" "}
+              Already have a Creator account?{" "}
               <a
                 href="/Creator/CreatorLogin"
                 className="text-purple-400 hover:underline font-medium"
               >
                 Log In
+              </a>
+            </p>
+            <p>
+              Are you a learner?{" "}
+              <a
+                href="/auth/login"
+                className="text-purple-400 hover:underline font-medium"
+              >
+                User Login
               </a>
             </p>
           </div>

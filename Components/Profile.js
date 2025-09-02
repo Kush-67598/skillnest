@@ -22,7 +22,9 @@ export default function ProfilePage({ user }) {
     Answer: "",
     Difficulty: "",
   });
+
   const [UserData, setUserData] = useState({});
+  const [pro, setIsPro] = useState({});
   useEffect(() => {
     const userFetch = async () => {
       if (!localStorage.getItem("USER_TOKEN")) return; // avoid bad fetch
@@ -34,6 +36,7 @@ export default function ProfilePage({ user }) {
       const res = await response.json();
 
       setUserData(res.POTD);
+      setIsPro(res.pro);
     };
     userFetch();
   }, []);
@@ -44,6 +47,9 @@ export default function ProfilePage({ user }) {
   const fileInputRef = useRef(null);
   const router = useRouter();
 
+  if (!UserData.length) {
+    return <Loader />;
+  }
   const POTDGROQ = async () => {
     setLoading(true);
     const response = await fetch("/api/Groq/POTDQuestion", { method: "POST" });
@@ -145,6 +151,7 @@ export default function ProfilePage({ user }) {
               />
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                 <FaUserEdit className="text-white text-2xl" />
+                
               </div>
               <input
                 type="file"
@@ -153,7 +160,15 @@ export default function ProfilePage({ user }) {
                 accept="image/*"
                 onChange={(e) => setFile(e.target.files[0])}
               />
+              
             </div>
+            <div
+                className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                  pro ? "bg-yellow-500 text-black" : "bg-green-600 text-white"
+                }`}
+              >
+                {pro ? "PRO" : "FREE"}
+              </div>
 
             {file && (
               <button
@@ -187,6 +202,7 @@ export default function ProfilePage({ user }) {
               <h3 className="text-sm font-semibold text-gray-300 mb-4">
                 Your Progress
               </h3>
+              
 
               {UserData.length > 0 ? (
                 UserData.map((POTD, index) => (
@@ -298,8 +314,9 @@ export default function ProfilePage({ user }) {
                     toast.info("Logged Out Successfully", { autoClose: 1000 });
                     setTimeout(() => {
                       localStorage.removeItem("USER_TOKEN");
+
                       router.push("/auth/login");
-                    }, 2000);
+                    }, 1000);
                   }}
                   className="flex items-center justify-between bg-gray-900 hover:bg-gray-700 border border-gray-700 rounded-xl px-4 py-3 cursor-pointer text-red-400"
                 >

@@ -1,6 +1,9 @@
+"use client";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const CTA = () => {
+  const router = useRouter();
   return (
     <>
       <section className=" bg-black/20 mt-32  backdrop-blur from-purple-700 via-pink-700 to-red-200 text-white rounded-2xl shadow-lg mx-auto max-w-5xl lg:max-w-full p-10 text-center">
@@ -11,7 +14,10 @@ const CTA = () => {
           Join thousands of developers, creators, and tech enthusiasts learning
           and growing together on SkillNest.
         </p>
-        <button className="bg-white text-purple-700 hover:bg-purple-100 transition-colors px-8 py-3 rounded-full text-lg font-semibold shadow-md">
+        <button
+          onClick={() => router.push("/Course")}
+          className="bg-white text-purple-700 hover:bg-purple-100 transition-colors px-8 py-3 rounded-full text-lg font-semibold shadow-md"
+        >
           Get Started
         </button>
       </section>

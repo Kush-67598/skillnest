@@ -23,7 +23,7 @@ export default function AuthWrapper({ children }) {
 
     // Determine if current path is a creator route
     const isCreatorRoute = pathname.startsWith("/Creator");
-
+    if(!userToken)
     // If token missing and not a public route → redirect
     if (!userToken && !creatorToken && !publicRoutes.includes(pathname)) {
       // Redirect based on route type

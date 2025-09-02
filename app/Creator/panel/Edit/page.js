@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Loader from "@/Components/Loader/loader";
 import Uploader from "@/Components/Loader/UploadLoader";
 
@@ -9,8 +9,8 @@ import { ToastContainer, toast } from "react-toastify";
 
 export default function CreatorDashboard({ searchParams }) {
   const [uploading, setUploading] = useState(false);
-  const unwrapped = React.use(searchParams);
-  const courseId = unwrapped.courseId;
+  const sParams = useSearchParams(); // <-- unwrap here
+  const courseId = sParams.get("courseId"); // <-- access the value
   const router = useRouter();
   const [token, setToken] = useState("");
 
@@ -38,6 +38,19 @@ export default function CreatorDashboard({ searchParams }) {
       },
     ]);
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("Token"); // creator token
+    if (!token) {
+      router.replace("/"); // kick out
+    }
+  }, [router]);
+  useEffect(() => {
+    const token = localStorage.getItem("Token"); // creator token
+    if (!token) {
+      router.replace("/"); // redirect if not creator
+    }
+  }, []);
 
   const [sectionData, setSectionData] = useState([
     {
@@ -237,6 +250,9 @@ export default function CreatorDashboard({ searchParams }) {
       [name]: value,
     }));
   };
+  if (!singleCourse.length) {
+    return <Loader />;
+  }
 
   const ADD_SUB_CH = async (courseId, chapter_id) => {
     try {

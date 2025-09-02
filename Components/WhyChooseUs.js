@@ -91,9 +91,9 @@ const WhyChooseUs = () => {
               altText={null}
               captionText={item.captionText}
               containerHeight="250px"
-              containerWidth={`${isMobile ? "200px" : "290px"}`}
+              containerWidth={`${isMobile ? "175px" : "220px"}`}
               imageHeight="250px"
-              imageWidth={`${isMobile ? "200px" : "290px"}`}
+              imageWidth={`${isMobile ? "175px" : "220px"}`}
               rotateAmplitude={12}
               scaleOnHover={1.1}
               showMobileWarning={false}
