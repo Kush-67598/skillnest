@@ -47,7 +47,7 @@ export default function ProfilePage({ user }) {
   const fileInputRef = useRef(null);
   const router = useRouter();
 
-  if (!UserData) {
+  if (!UserData || Object.keys(UserData).length === 0) {
     return <Loader />;
   }
   const POTDGROQ = async () => {
@@ -151,7 +151,6 @@ export default function ProfilePage({ user }) {
               />
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                 <FaUserEdit className="text-white text-2xl" />
-                
               </div>
               <input
                 type="file"
@@ -160,15 +159,14 @@ export default function ProfilePage({ user }) {
                 accept="image/*"
                 onChange={(e) => setFile(e.target.files[0])}
               />
-              
             </div>
             <div
-                className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                  pro ? "bg-yellow-500 text-black" : "bg-green-600 text-white"
-                }`}
-              >
-                {pro ? "PRO" : "FREE"}
-              </div>
+              className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                pro ? "bg-yellow-500 text-black" : "bg-green-600 text-white"
+              }`}
+            >
+              {pro ? "PRO" : "FREE"}
+            </div>
 
             {file && (
               <button
@@ -202,7 +200,6 @@ export default function ProfilePage({ user }) {
               <h3 className="text-sm font-semibold text-gray-300 mb-4">
                 Your Progress
               </h3>
-              
 
               {UserData.length > 0 ? (
                 UserData.map((POTD, index) => (
