@@ -47,7 +47,7 @@ export default function ProfilePage({ user }) {
   const fileInputRef = useRef(null);
   const router = useRouter();
 
-  if (!UserData.length) {
+  if (!UserData) {
     return <Loader />;
   }
   const POTDGROQ = async () => {
