@@ -14,6 +14,9 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userPlan, setUserPlan] = useState("Free");
   const [token, setToken] = useState(null);
+  const pathname = usePathname();
+
+  const Course_Route = pathname.startsWith("/Course");
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
@@ -56,7 +59,6 @@ const Navbar = () => {
       router.replace("/auth/login");
     }, 100);
   };
-  const pathname = usePathname();
   const Homepage = pathname === "/";
   const CreatorLogin_signup =
     pathname === "/Creator/CreatorLogin" ||
@@ -82,10 +84,12 @@ const Navbar = () => {
   return (
     <nav
       className={`sticky top-0 z-50 ${
-        isMobile && !Homepage && (!userLogin_signup || !CreatorLogin_signup)
+        Course_Route
+          ? "mb-0"
+          : isMobile && !Homepage && (!userLogin_signup || !CreatorLogin_signup)
           ? "mb-20"
           : ""
-      }   backdrop-blur-md bg-black/50 border-b border-white/10 shadow-lg`}
+      } backdrop-blur-md bg-black/50 border-b border-white/10 shadow-lg`}
     >
       {" "}
       <div

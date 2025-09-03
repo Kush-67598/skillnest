@@ -9,7 +9,7 @@ export default function Course() {
   const [currentPage, setCurrentPage] = useState(0);
 
   const fetchCourses = async (page = 0) => {
-    setLoading(true)
+    setLoading(true);
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API}/api/Course?page=${page}`,
       {
@@ -17,7 +17,7 @@ export default function Course() {
         next: { revalidate: 60 },
       }
     );
-    setLoading(false)
+    setLoading(false);
     const data = await res.json();
     setCourses(data.allCourses || []);
   };
