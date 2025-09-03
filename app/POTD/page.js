@@ -72,7 +72,7 @@ export default function Test() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-900 px-6 py-10 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-900 px-6  -mt-20 py-10 flex items-center justify-center">
         <div className="w-full max-w-full grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left - Questions */}
           <div className="bg-gray-800 p-6 rounded-2xl shadow-lg">

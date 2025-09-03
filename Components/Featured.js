@@ -4,7 +4,28 @@ import React from "react";
 import { motion } from "framer-motion";
 
 const Featured = () => {
-  const featuredCourses = [0.2, 0.4, 0.6, 0.8];
+  const featuredCourses = [
+    {
+      title: "Blender",
+      description:
+        "Learn 3D modeling, animation, and rendering to create stunning visuals and animations with Blender.",
+    },
+    {
+      title: "DevOps",
+      description:
+        "Master DevOps practices, CI/CD pipelines, and cloud deployment for faster and reliable software delivery.",
+    },
+    {
+      title: "AI",
+      description:
+        "Explore artificial intelligence, machine learning, and deep learning to build intelligent applications.",
+    },
+    {
+      title: "Full Stack",
+      description:
+        "Become a full-stack developer by learning frontend, backend, and database technologies for end-to-end web apps.",
+    },
+  ];
 
   return (
     <section className="relative py-16 text-white">
@@ -21,7 +42,7 @@ const Featured = () => {
       </motion.h1>
 
       <div className="max-w-[100rem] mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {featuredCourses.map((_, index) => (
+        {featuredCourses.map((course, index) => (
           <motion.div
             key={index}
             className="bg-black/40 backdrop-blur-md rounded-2xl shadow-lg p-6 flex flex-col items-center text-center cursor-pointer"
@@ -37,12 +58,9 @@ const Featured = () => {
             }}
           >
             <div className="bg-gradient-to-r bg-clip-text text-transparent from-purple-900 via-orange-400 to-purple-500 text-2xl py-3">
-              {`Course ${index + 1}`}
+              {course.title}
             </div>
-            <p className="text-white/80 text-md py-3">
-              This course will guide you step by step to master essential skills
-              and take your career to the next level.
-            </p>
+            <p className="text-white/80 text-md py-3">{course.description}</p>
             <button className="mt-4 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 via-blue-500 to-red-400 text-black font-semibold shadow-md hover:-translate-y-1 transition-transform duration-200">
               View Course
             </button>

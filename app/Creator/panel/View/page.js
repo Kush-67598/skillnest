@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 export default function CreatorMyCourses() {
   const [token, setToken] = useState("");
   const [allCourses, setAllCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -16,7 +16,11 @@ export default function CreatorMyCourses() {
 
     const savedToken = localStorage.getItem("Token");
     if (!savedToken) {
-      toast.error("Please log in first!");
+      toast.error("Please log in first!", {
+        hideProgressBar: true,
+        pauseOnHover: false,
+        autoClose: 1000,
+      });
       router.push("/Creator/CreatorLogin");
       return;
     }
@@ -49,7 +53,11 @@ export default function CreatorMyCourses() {
         }
       } catch (err) {
         console.error(err);
-        toast.error("Failed to load courses. Please try again.");
+        toast.error("Failed to load courses. Please try again.", {
+          hideProgressBar: true,
+          pauseOnHover: false,
+          autoClose: 1000,
+        });
       } finally {
         setLoading(false);
       }
@@ -61,7 +69,11 @@ export default function CreatorMyCourses() {
   useEffect(() => {
     const savedToken = localStorage.getItem("Token"); // creator token
     if (!savedToken) {
-      toast.error("Please log in first!");
+      toast.error("Please log in first!", {
+        hideProgressBar: true,
+        pauseOnHover: false,
+        autoClose: 1000,
+      });
       router.replace("/"); // 👈 always redirect home if no token
       return;
     }
@@ -76,11 +88,11 @@ export default function CreatorMyCourses() {
 
   if (!allCourses || allCourses.length === 0)
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
+      <div className="min-h-screen flex flex-col items-center justify-center  text-white">
         <p className="text-2xl mb-4">No courses found!</p>
         <button
           className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded text-white"
-          onClick={() => router.push("/Creator/panel/Create")}
+          onClick={() => router.push("/Creator/panel/Edit")}
         >
           Create Your First Course
         </button>
@@ -88,7 +100,7 @@ export default function CreatorMyCourses() {
     );
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6 space-y-6">
+    <div className="min-h-screen -mt-14 p-6 space-y-6">
       <ToastContainer position="top-right" theme="dark" />
       <h1 className="text-3xl font-semibold mb-4 text-white">My Courses</h1>
 

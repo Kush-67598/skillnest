@@ -1,45 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import Script from "next/script";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
-export default function CreatorLogin() {
+export default function CreatorSignup() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    window.google_response = async (response) => {
-      try {
-        const res = await fetch("/api/CreatorAuth/Google", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({
-            credential: response.credential,
-            type: "creator",
-          }),
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-          localStorage.setItem("Token", data.token);
-          toast.success("Logged in with Google!", { autoClose: 1200 });
-          router.push("/Creator/panel/View");
-        } else {
-          toast.error(data.error || "Google login failed", { autoClose: 1200 });
-        }
-      } catch (err) {
-        toast.error("Something went wrong", { autoClose: 1200 });
-      }
-    };
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,16 +30,26 @@ export default function CreatorLogin() {
 
       if (res.success) {
         localStorage.setItem("Token", res.token);
-        toast.success("Successfully Logged In", { autoClose: 1200 });
+        toast.success("Successfully Logged In!", {
+          autoClose: 1200,
+          pauseOnHover: false,
+          hideProgressBar: true,
+        });
         router.push("/Creator/panel/View");
-      } else if (res.creator === false) {
-        toast.error("User Not Found", { autoClose: 1200 });
       } else {
-        toast.error(res.message || "Invalid Credentials", { autoClose: 1200 });
+        toast.error(res.message || "Login failed", {
+          autoClose: 1200,
+          pauseOnHover: false,
+          hideProgressBar: true,
+        });
       }
     } catch (err) {
       setLoading(false);
-      toast.error("Internal Server Error", { autoClose: 1200 });
+      toast.error("Internal Server Error", {
+        autoClose: 1200,
+        pauseOnHover: false,
+        hideProgressBar: true,
+      });
     }
   };
 
@@ -74,11 +57,11 @@ export default function CreatorLogin() {
     <>
       <ToastContainer position="top-right" theme="dark" />
 
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-indigo-900 px-4">
-        <div className="w-full max-w-5xl bg-gradient-to-br from-purple-800/80 to-indigo-800/80 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 text-white">
+      <div className="-mt-30 min-h-screen flex items-center justify-center bg-gradient-to-br  px-4">
+        <div className="w-full max-w-5xl bg-gradient-to-br  to-indigo-800/80 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 text-white">
           <h2 className="text-3xl font-bold text-center mb-4">Creator Login</h2>
           <p className="text-gray-300 text-center mb-6">
-            Log in to your Creator account and manage your content.
+            Create your Creator account and start sharing your content.
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -113,10 +96,12 @@ export default function CreatorLogin() {
               type="submit"
               disabled={loading}
               className={`w-full py-3 rounded-lg font-semibold transition ${
-                loading ? "bg-purple-400 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"
+                loading
+                  ? "bg-purple-400 cursor-not-allowed"
+                  : "bg-purple-600 hover:bg-purple-700"
               }`}
             >
-              {loading ? "Logging in..." : "Log In"}
+              {loading ? "Logging in..." : "Login"}
             </button>
           </form>
 
@@ -131,7 +116,7 @@ export default function CreatorLogin() {
             <div
               id="g_id_onload"
               data-client_id={process.env.NEXT_PUBLIC_CLIENT_ID}
-              data-context="signin"
+              data-context="signup"
               data-ux_mode="popup"
               data-callback="google_response"
             />
@@ -140,7 +125,7 @@ export default function CreatorLogin() {
 
           <div className="flex flex-col justify-center items-center gap-4 mt-6 text-sm text-gray-300">
             <p>
-              Dont have a Creator account?{" "}
+              New Creator account?{" "}
               <a
                 href="/Creator/CreatorSignup"
                 className="text-purple-400 hover:underline font-medium"
@@ -151,10 +136,10 @@ export default function CreatorLogin() {
             <p>
               Are you a learner?{" "}
               <a
-                href="/auth/login"
+                href="/auth/signup"
                 className="text-purple-400 hover:underline font-medium"
               >
-                User Login
+                User Signup
               </a>
             </p>
           </div>

@@ -1,10 +1,12 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { FaUser, FaBars, FaTimes } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { TbLogout } from "react-icons/tb";
 import useCheckView from "@/Hooks/useCheckView";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const router = useRouter();
@@ -44,13 +46,51 @@ const Navbar = () => {
     localStorage.removeItem("USER_TOKEN");
     localStorage.removeItem("Token");
     setToken(null);
-    router.replace("/auth/login");
+
+    toast.success("Successfully Logged Out", {
+      autoClose: 1000,
+      hideProgressBar: true,
+      pauseOnHover: false,
+    });
+    setTimeout(() => {
+      router.replace("/auth/login");
+    }, 100);
   };
+  const pathname = usePathname();
+  const Homepage = pathname === "/";
+  const CreatorLogin_signup =
+    pathname === "/Creator/CreatorLogin" ||
+    pathname === "/Creator/CreatorSignup";
+  const userLogin_signup =
+    pathname === "/auth/login" || pathname === "/auth/signup";
+  const Panel = pathname.startsWith("/Creator/panel");
+  const MyCourse_profile =
+    pathname.startsWith("/Course") ||
+    [
+      "/About",
+      "/Feedback",
+      "/POTD",
+      "/Profile",
+      "/MyCourses",
+      "/Legal",
+      "/Settings",
+      "/Contact",
+      "/Checkout",
+      "/Bookmarks",
+    ].includes(pathname);
 
   return (
-<nav className="sticky top-0 z-50 backdrop-blur-md bg-black/50 border-b border-white/10 shadow-lg">      <div
+    <nav
+      className={`sticky top-0 z-50 ${
+        isMobile && !Homepage && (!userLogin_signup || !CreatorLogin_signup)
+          ? "mb-20"
+          : ""
+      }   backdrop-blur-md bg-black/50 border-b border-white/10 shadow-lg`}
+    >
+      {" "}
+      <div
         className={`max-w-7xl mx-auto flex items-center ${
-          token ? "justify-between" : "justify-center"
+          Homepage ? "justify-between" : "justify-between"
         } px-6 py-4`}
       >
         {/* Brand Logo */}
@@ -59,86 +99,91 @@ const Navbar = () => {
             SkillNest
           </span>
         </Link>
+        {Panel && (
+          <button
+            onClick={handleLogout}
+            className="fixed right-12 px-3 py-1 rounded-lg hover:bg-gray-700 text-white font-medium transition"
+          >
+            <TbLogout className="text-2xl" />
+          </button>
+        )}
 
         {/* Desktop Links (only if logged in) */}
-        {token && (
-          <ul className="hidden md:flex gap-8 text-sm font-medium text-white/90">
-            <Link href={"/"}>Home</Link>
-            <Link href={"/Course"}>Course</Link>
-            {["About", "Contact", "MyCourses"].map((link) => (
+        {(Homepage || MyCourse_profile) &&
+          !userLogin_signup &&
+          !CreatorLogin_signup && (
+            <ul className="hidden md:flex gap-8 text-sm font-medium text-white/90">
+              {["Home", "Course", "MyCourses", "Contact", "About"].map(
+                (link) => (
+                  <li key={link}>
+                    <Link
+                      href={`/${link == "Home" ? "/" : link}`}
+                      className="relative px-3 py-1 rounded-lg hover:text-purple-400 transition-colors duration-300 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-purple-400 after:transition-all after:duration-300 hover:after:w-full"
+                    >
+                      {link}
+                    </Link>
+                  </li>
+                )
+              )}
+            </ul>
+          )}
+
+        {(Homepage || MyCourse_profile) &&
+          !userLogin_signup &&
+          !CreatorLogin_signup && (
+            <div className="flex items-center gap-3">
+              <div
+                onClick={() => router.push("/Profile")}
+                className="p-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 hover:scale-110 transition-transform cursor-pointer shadow-lg flex items-center gap-2"
+              >
+                <FaUser className="text-white text-sm" />
+              </div>
+
+              <button
+                onClick={handleLogout}
+                className="px-3 py-1 rounded-lg hover:bg-gray-700 text-white font-medium transition"
+              >
+                <TbLogout className="text-2xl" />
+              </button>
+              <div
+                className="md:hidden text-white cursor-pointer"
+                onClick={toggleMenu}
+              >
+                {menuOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
+              </div>
+            </div>
+          )}
+      </div>
+      {/* Mobile Menu */}
+      {(Homepage || MyCourse_profile) &&
+        !userLogin_signup &&
+        !CreatorLogin_signup &&
+        menuOpen && (
+          <ul className="md:hidden flex flex-col gap-4 px-6 pb-4 bg-black/70 backdrop-blur-md border-t border-white/10">
+            {["Home", "About", "Contact", "Course", "MyCourses"].map((link) => (
               <li key={link}>
                 <Link
-                  href={`/${link}`}
-                  className="relative px-3 py-1 rounded-lg hover:text-purple-400 transition-colors duration-300 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-purple-400 after:transition-all after:duration-300 hover:after:w-full"
+                  href={`/${link === "Home" ? "" : link}`}
+                  className="block px-3 py-2 rounded-lg text-white hover:bg-purple-500/20 transition"
+                  onClick={() => setMenuOpen(false)}
                 >
                   {link}
                 </Link>
               </li>
             ))}
+            <li>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setMenuOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition"
+              >
+                Logout
+              </button>
+            </li>
           </ul>
         )}
-
-        {/* Profile + Badge + Hamburger (only if logged in) */}
-        {token && (
-          <div className="flex items-center gap-3">
-            <div
-              onClick={() => router.push("/Profile")}
-              className="p-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 hover:scale-110 transition-transform cursor-pointer shadow-lg flex items-center gap-2"
-            >
-              <FaUser className="text-white text-sm" />
-            </div>
-            {/* <span
-              className={`text-xs font-semibold px-2 py-1 rounded ${
-                userPlan === "Pro"
-                  ? "bg-red-500 text-black"
-                  : "bg-green-400 text-black"
-              }`}
-            >
-              {userPlan}
-            </span> */}
-            <button
-              onClick={handleLogout}
-              className="px-3 py-1 rounded-lg hover:bg-gray-700 text-white font-medium transition"
-            >
-              <TbLogout className="text-2xl" />
-            </button>
-            <div
-              className="md:hidden text-white cursor-pointer"
-              onClick={toggleMenu}
-            >
-              {menuOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Mobile Menu */}
-      {token && menuOpen && (
-        <ul className="md:hidden flex flex-col gap-4 px-6 pb-4 bg-black/70 backdrop-blur-md border-t border-white/10">
-          {["Home", "About", "Contact", "Course", "MyCourses"].map((link) => (
-            <li key={link}>
-              <Link
-                href={`/${link === "Home" ? "" : link}`}
-                className="block px-3 py-2 rounded-lg text-white hover:bg-purple-500/20 transition"
-                onClick={() => setMenuOpen(false)}
-              >
-                {link}
-              </Link>
-            </li>
-          ))}
-          <li>
-            <button
-              onClick={() => {
-                handleLogout();
-                setMenuOpen(false);
-              }}
-              className="w-full text-left px-3 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition"
-            >
-              Logout
-            </button>
-          </li>
-        </ul>
-      )}
     </nav>
   );
 };

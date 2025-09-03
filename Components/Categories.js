@@ -3,8 +3,10 @@
 import TiltedCard from "@/Bits/Components/TiltedCard/TiltedCard";
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 const Categories = () => {
+  const router = useRouter();
   const CategoriesData = [
     {
       imageSrc: "/ai.jpeg",
@@ -106,7 +108,10 @@ const Categories = () => {
           learning to designing in Blender or securing Linux systems, our skill
           tracks guide you step by step toward real expertise.
         </p>
-        <button className="cursor-pointer my-8 py-4 bg-gradient-to-r text-black font-bold shadow-2xl hover:-translate-y-1.5 duration-200 hover:transition-all from-slate-100 via-purple-600 to-red-300 rounded-lg px-2">
+        <button
+          onClick={() => router.push("/Course")}
+          className="cursor-pointer my-8 py-4 bg-gradient-to-r text-black font-bold shadow-2xl hover:-translate-y-1.5 duration-200 hover:transition-all from-slate-100 via-purple-600 to-red-300 rounded-lg px-2"
+        >
           Browse Now
         </button>
       </motion.div>

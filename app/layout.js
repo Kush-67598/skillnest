@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
         >
           <AuthWrapper>
           <Navbar />
-          <main className="pt-[4.2rem] flex-1">{children}</main>
+          <main className="">{children}</main>
           <ToastContainer />
           <Footer />
         </AuthWrapper>

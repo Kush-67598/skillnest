@@ -1,10 +1,11 @@
+import Link from "next/link";
 import React from "react";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { SiX } from "react-icons/si"; // X icon
 
 const Footer = () => {
   return (
-    <footer className="bg-black/50 backdrop-blur-md mt-16 text-gray-300 py-8">
+    <footer className="bg-black/50 backdrop-blur-md mt-40 text-gray-300 py-8">
       <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Brand */}
         <div>
@@ -19,19 +20,19 @@ const Footer = () => {
           <h4 className="font-semibold mb-2">Quick Links</h4>
           <ul className="space-y-1 text-sm">
             <li>
-              <a href="#">Home</a>
+              <Link href="/">Home</Link>
             </li>
             <li>
-              <a href="/Course">Courses</a>
+              <Link href={"/Course"}>Courses</Link>
             </li>
             <li>
-              <a href="#pricing">Pricing</a>
+              <Link href={"#pricing"}>Pricing</Link>
             </li>
             <li>
-              <a href="#FAQ">FAQ</a>
+              <Link href={"/#FAQ"}>FAQ</Link>
             </li>
             <li>
-              <a href="#Testimonials">Testimonials</a>
+              <a href={"#Testimonials"}>Testimonials</a>
             </li>
           </ul>
         </div>
@@ -43,7 +44,10 @@ const Footer = () => {
             <a target="_blank" href="https://github.com/Kush-67598">
               <FaGithub size={20} />
             </a>
-            <a target="_blank" href="https://linkedin.com/in/kush-kumar-singh-623804340">
+            <a
+              target="_blank"
+              href="https://linkedin.com/in/kush-kumar-singh-623804340"
+            >
               <FaLinkedin size={20} />
             </a>
             <a target="_blank" href="https://x.com/Kush67598">

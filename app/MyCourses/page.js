@@ -8,7 +8,7 @@ export default function MyCoursesPage() {
   const [token, setToken] = useState(null);
   const [myCourses, setMyCourses] = useState([]);
   const [track, setTrack] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const finalUrl = (courseId, chapterId, subchapterId, lessonId) => {
@@ -24,42 +24,42 @@ export default function MyCoursesPage() {
 
   useEffect(() => {
     const t = localStorage.getItem("USER_TOKEN");
-    setToken(t);
-  }, []);
+    if (!t) {
+      router.push("/login");
+    } else {
+      setToken(t);
+    }
+  }, [router]);
 
   useEffect(() => {
-    if (token) {
-      Promise.all([FetchTracked(), fetchMyCourses()]).finally(() =>
-        setLoading(false)
-      );
-    }
+    if (!token) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [trackedRes, coursesRes] = await Promise.all([
+          fetch("/api/track-progress", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch("/api/enrolledCourse", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        const trackedData = await trackedRes.json();
+        const coursesData = await coursesRes.json();
+
+        if (trackedData.success) setTrack(trackedData.getTracked);
+        if (coursesData.success) setMyCourses(coursesData.courses);
+      } catch (err) {
+        console.error("Failed to fetch courses or progress:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [token]);
-
-  const FetchTracked = async () => {
-    try {
-      const res = await fetch("/api/track-progress", {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (data.success) setTrack(data.getTracked);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const fetchMyCourses = async () => {
-    try {
-      const res = await fetch("/api/enrolledCourse", {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (data.success) setMyCourses(data.courses);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 py-12 px-4">
@@ -69,7 +69,7 @@ export default function MyCoursesPage() {
 
       {loading ? (
         <p className="text-center text-white animate-pulse">
-          Loading your courses...
+          Loading your course...
         </p>
       ) : (
         <>
@@ -82,7 +82,6 @@ export default function MyCoursesPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {myCourses.map((course) => {
               const trackItem = track.find((t) => t.courseId === course._id);
-              const progress = trackItem?.progress || 0;
               const continueUrl = trackItem
                 ? finalUrl(
                     course._id,
@@ -106,22 +105,14 @@ export default function MyCoursesPage() {
                     <p className="text-gray-300 py-2 text-sm line-clamp-3 mb-4">
                       {course.description}
                     </p>
-
-                    {/* Progress */}
-                    {/* <div className="h-3 bg-gray-700 rounded-full overflow-hidden mb-2">
-                      <div
-                        className="h-full bg-gradient-to-r from-green-400 via-green-500 to-green-600 transition-all duration-500"
-                        style={{ width: `${progress}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-gray-400 mb-4">
-                      {progress}% completed
-                    </p> */}
                   </div>
 
                   <button
-                    onClick={() => router.push(continueUrl)}
-                    className="  w-full py-3 my-4 bg-gradient-to-r from-purple-900 via-slate-500 to-purple-300 text-white font-semibold rounded-xl shadow-lg hover:scale-105 transition-transform duration-300"
+                    onClick={() => {
+                      setLoading(true);
+                      router.push(continueUrl);
+                    }}
+                    className="w-full py-3 my-4 bg-gradient-to-r from-purple-900 via-slate-500 to-purple-300 text-white font-semibold rounded-xl shadow-lg hover:scale-105 transition-transform duration-300"
                   >
                     ▶ Continue
                   </button>

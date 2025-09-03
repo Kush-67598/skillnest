@@ -1,17 +1,20 @@
 "use client";
-
+import { MdDelete } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import Loader from "@/Components/Loader/loader";
 import Uploader from "@/Components/Loader/UploadLoader";
 
 import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import useCheckView from "@/Hooks/useCheckView";
 
 export default function CreatorDashboard({ searchParams }) {
+  const isMobile = useCheckView();
   const [uploading, setUploading] = useState(false);
   const courseId = React.use(searchParams).courseId;
   const router = useRouter();
   const [token, setToken] = useState("");
+  const [CreatorCourses, setCreatorCourse] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [singleCourse, setSingleCourse] = useState([]);
@@ -38,16 +41,28 @@ export default function CreatorDashboard({ searchParams }) {
     ]);
   };
 
+  const fetchAllCourses = async () => {
+    const response = await fetch("/api/CreatorCourse", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${localStorage.getItem("Token")}` },
+    });
+    const res = await response.json();
+    setCreatorCourse(res.Creator_courses); //returns array
+  };
   useEffect(() => {
-    const token = localStorage.getItem("Token"); // creator token
-    if (!token) {
-      router.replace("/"); // kick out
+    if (!token) return;
+    if (token) {
+      fetchAllCourses();
     }
-  }, [router]);
+  }, []);
+  console.log("CreatorCourses", CreatorCourses);
+
   useEffect(() => {
     const token = localStorage.getItem("Token"); // creator token
     if (!token) {
       router.replace("/"); // redirect if not creator
+    } else {
+      setToken(token);
     }
   }, []);
 
@@ -59,6 +74,7 @@ export default function CreatorDashboard({ searchParams }) {
       images: [],
     },
   ]);
+
   const handleLessonChange = (e) => {
     const { name, value } = e.target;
     setLessonsData((prev) => ({
@@ -85,7 +101,7 @@ export default function CreatorDashboard({ searchParams }) {
 
     setSingleCourse([response.reqCourse]);
   };
-
+  console.log(singleCourse);
   const UploadThumbnail = async () => {
     const sigRes = await fetch(
       `${process.env.NEXT_PUBLIC_API}/api/handle_uploads`,
@@ -93,7 +109,12 @@ export default function CreatorDashboard({ searchParams }) {
     );
     const { signature, timestamp, apiKey, folder } = await sigRes.json();
     if (!file) {
-      alert("PLEASE UPLOAD THE FILE");
+      toast.info("PLEASE UPLOAD THE FILE", {
+        autoClose: 1000,
+        pauseOnHover: false,
+        hideProgressBar: true,
+        position: "top-center",
+      });
     }
     if (file) {
       const formData = new FormData();
@@ -115,6 +136,7 @@ export default function CreatorDashboard({ searchParams }) {
       setLoading(false);
       toast.success("Video Uploaded Successfully", {
         autoClose: 1000,
+        hideProgressBar: true,
         pauseOnHover: false,
       });
     }
@@ -126,7 +148,11 @@ export default function CreatorDashboard({ searchParams }) {
     );
     const { signature, timestamp, apiKey, folder } = await sigRes.json();
     if (!file) {
-      alert("PLEASE UPLOAD THE FILE");
+      toast.info("Select A File To Upload", {
+        autoClose: 1000,
+        pauseOnHover: false,
+        hideProgressBar: true,
+      });
     }
     if (file) {
       const formData = new FormData();
@@ -151,9 +177,11 @@ export default function CreatorDashboard({ searchParams }) {
       toast.success("Video Uploaded Successfully", {
         autoClose: 1000,
         pauseOnHover: false,
+        hideProgressBar: true,
       });
     }
   };
+
   const handleImageUpload = async () => {
     const sigRes = await fetch(
       `${process.env.NEXT_PUBLIC_API}/api/handle_uploads`,
@@ -191,6 +219,7 @@ export default function CreatorDashboard({ searchParams }) {
     toast.success("Images Uploaded Successfully", {
       autoClose: 1000,
       pauseOnHover: false,
+      hideProgressBar: true,
     });
   };
 
@@ -249,9 +278,6 @@ export default function CreatorDashboard({ searchParams }) {
       [name]: value,
     }));
   };
-  if (!singleCourse.length) {
-    return <Loader />;
-  }
 
   const ADD_SUB_CH = async (courseId, chapter_id) => {
     try {
@@ -271,6 +297,7 @@ export default function CreatorDashboard({ searchParams }) {
         toast.success("SubChapter Added Successfully", {
           autoClose: 1000,
           pauseOnHover: false,
+          hideProgressBar: true,
         });
         fetchOne(courseId);
         setSubChapterData({
@@ -282,6 +309,7 @@ export default function CreatorDashboard({ searchParams }) {
       toast.error("Internal Server Error!! SubChapter Can't be Added", {
         autoClose: 1000,
         pauseOnHover: false,
+        hideProgressBar:true
       });
     } finally {
       setLoading(false);
@@ -307,6 +335,7 @@ export default function CreatorDashboard({ searchParams }) {
         toast.success("Chapter Added Successfully", {
           autoClose: 1000,
           pauseOnHover: false,
+          hideProgressBar: true,
         });
         setChapterData({ title: "", order: "" });
         fetchOne(courseId);
@@ -315,6 +344,7 @@ export default function CreatorDashboard({ searchParams }) {
       toast.error("Internal Server Error!! Chapter Can't be Added", {
         autoClose: 1000,
         pauseOnHover: false,
+        hideProgressBar:true
       });
     } finally {
       setLoading(false);
@@ -340,6 +370,7 @@ export default function CreatorDashboard({ searchParams }) {
         toast.success("Lesson Added Successfully", {
           autoClose: 1000,
           pauseOnHover: false,
+          hideProgressBar: true,
         });
         fetchOne(courseId);
       }
@@ -347,6 +378,7 @@ export default function CreatorDashboard({ searchParams }) {
       toast.error("Internal Server Error!! Lesson Can't be Added", {
         autoClose: 1000,
         pauseOnHover: false,
+        hideProgressBar:true
       });
     } finally {
       setLoading(false);
@@ -388,6 +420,7 @@ export default function CreatorDashboard({ searchParams }) {
         toast.success("Course Added Successfully", {
           autoClose: 1000,
           pauseOnHover: false,
+          hideProgressBar: true,
         });
         setFormData({
           slug: "",
@@ -403,6 +436,7 @@ export default function CreatorDashboard({ searchParams }) {
       toast.error("Internal Server Error!! Course Can't be Added", {
         autoClose: 1000,
         pauseOnHover: false,
+        hideProgressBar:true
       });
     } finally {
       setLoading(false);
@@ -421,20 +455,21 @@ export default function CreatorDashboard({ searchParams }) {
           method: "DELETE",
         }
       );
-      setLoading(false);
 
       const response = await deleteCourse.json();
       if (response.success) {
         toast.success("Course Deleted Successfully", {
           autoClose: 1000,
           pauseOnHover: false,
+          hideProgressBar: true,
         });
-        fetchOne(courseId);
+        router.push("/Creator/panel/View");
       }
     } catch (error) {
       toast.error("Internal Server Error!! Course Can't be Deleted", {
         autoClose: 1000,
         pauseOnHover: false,
+        hideProgressBar:true
       });
     } finally {
       setLoading(false);
@@ -460,6 +495,7 @@ export default function CreatorDashboard({ searchParams }) {
         toast.success("Chapter Deleted Successfully", {
           autoClose: 1000,
           pauseOnHover: false,
+          hideProgressBar: true,
         });
         fetchOne(courseId);
       }
@@ -467,6 +503,7 @@ export default function CreatorDashboard({ searchParams }) {
       toast.error("Internal Server Error!! Chapter Can't be Deleted", {
         autoClose: 1000,
         pauseOnHover: false,
+        hideProgressBar:true
       });
     } finally {
       setLoading(false);
@@ -492,6 +529,7 @@ export default function CreatorDashboard({ searchParams }) {
         toast.success("Subchapter Deleted Successfully", {
           autoClose: 1000,
           pauseOnHover: false,
+          hideProgressBar: true,
         });
         fetchOne(courseId);
       }
@@ -499,6 +537,7 @@ export default function CreatorDashboard({ searchParams }) {
       toast.error("Internal Server Error!! Subchapter Can't be Deleted", {
         autoClose: 1000,
         pauseOnHover: false,
+        hideProgressBar:true
       });
     } finally {
       setLoading(false);
@@ -524,6 +563,7 @@ export default function CreatorDashboard({ searchParams }) {
         toast.success("Lesson Deleted Successfully", {
           autoClose: 1000,
           pauseOnHover: false,
+          hideProgressBar: true,
         });
         fetchOne(courseId);
       }
@@ -531,6 +571,7 @@ export default function CreatorDashboard({ searchParams }) {
       toast.error("Internal Server Error!! Lesson Can't be Deleted", {
         autoClose: 1000,
         pauseOnHover: false,
+        hideProgressBar:true
       });
     } finally {
       setLoading(false);
@@ -570,9 +611,19 @@ export default function CreatorDashboard({ searchParams }) {
               } bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500`}
             />
           ))}
-          <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+          <div className="flex items-center gap-3">
+            <label className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md cursor-pointer transition">
+              Browse
+              <input
+                type="file"
+                onChange={(e) => setFile(e.target.files[0])}
+                className="hidden"
+              />
+            </label>
+            {file && <span className="text-sm text-gray-300">{file.name}</span>}
+          </div>{" "}
           <button
-            className="bg-purple-500 p-3 mt-3 mx-2 rounded-md"
+            className="bg-green-600 hover:bg-green-700 p-3 mt-3  rounded-md"
             onClick={() => UploadThumbnail()}
           >
             Upload Thumbnail
@@ -604,16 +655,18 @@ export default function CreatorDashboard({ searchParams }) {
             >
               <div className="space-y-1 flex items-center justify-between">
                 <div className="flex flex-col">
-                  <h2 className="text-2xl font-semibold">{course.title}</h2>
+                  <h2 className="text-2xl font-semibold">
+                    Course:{course.title}
+                  </h2>
                   <p className="text-sm text-gray-300">
                     Price: ${course.price}
                   </p>
                 </div>
                 <button
                   onClick={() => delete_Course(course._id)}
-                  className="bg-red-600 px-4 py-2 rounded-md text-sm hover:bg-red-700 transition"
+                  className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white rounded-full shadow-md transition duration-200 px-4 py-2 mx-2 "
                 >
-                  Delete Course
+                  <MdDelete />
                 </button>
               </div>
 
@@ -668,9 +721,9 @@ export default function CreatorDashboard({ searchParams }) {
                         <div className="flex items-center justify-center">
                           <button
                             onClick={() => delete_chapter(course._id, ch._id)}
-                            className="bg-red-600 px-4 py-2 mx-3 rounded-md hover:bg-red-700 transition text-sm"
+                            className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white rounded-full shadow-md transition duration-200 px-4 py-2 mx-2 "
                           >
-                            Delete
+                            <MdDelete />
                           </button>
                           <button
                             onClick={() => toggleChapter(ch._id)}
@@ -738,9 +791,9 @@ export default function CreatorDashboard({ searchParams }) {
                                           item._id
                                         )
                                       }
-                                      className="bg-red-600 px-4 py-2 mx-3 rounded-md hover:bg-red-700 transition text-sm"
+                                      className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white rounded-full shadow-md transition duration-200 px-4 py-2 mx-2 "
                                     >
-                                      Delete sub
+                                      <MdDelete />
                                     </button>
                                     <button
                                       onClick={() => toggleSubchapter(item._id)}
@@ -784,33 +837,62 @@ export default function CreatorDashboard({ searchParams }) {
                                       className="w-full hidden p-2 rounded-md bg-gray-500 placeholder-gray-400"
                                     />
 
-                                    <div className="flex justify-start items-center ">
-                                      <input
-                                        type="file"
-                                        onChange={(e) =>
-                                          setFile(e.target.files[0])
-                                        }
-                                        className="mx-2 rounded-2xl py-4"
-                                      />
+                                    <div
+                                      className={`flex ${
+                                        isMobile ? "flex-col" : "flex"
+                                      } justify-start items-center`}
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <label className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg shadow-md cursor-pointer transition">
+                                          Browse
+                                          <input
+                                            type="file"
+                                            onChange={(e) =>
+                                              setFile(e.target.files[0])
+                                            }
+                                            className="hidden"
+                                          />
+                                        </label>
+                                        {file && (
+                                          <span className="text-sm text-gray-300">
+                                            {file.name}
+                                          </span>
+                                        )}
+                                      </div>
                                       <button
                                         onClick={handleUpload}
-                                        className="bg-blue-500 p-2 rounded-xl"
+                                        className="bg-green-600 hover:bg-green-700 my-2 mx-3 p-3 rounded-xl"
                                       >
                                         Upload Lesson Video
                                       </button>
                                     </div>
-                                    <div className="flex justify-start items-center ">
-                                      <input
-                                        type="file"
-                                        onChange={(e) =>
-                                          setImageFiles([...e.target.files])
-                                        }
-                                        multiple
-                                        className="mx-2 rounded-2xl py-4"
-                                      />
+                                    <div
+                                      className={`flex ${
+                                        isMobile ? "flex-col" : "flex"
+                                      } justify-start items-center`}
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <label className="bg-blue-600 hover:bg-blue-700 text-white p-3 my-2 rounded-lg shadow-md cursor-pointer transition">
+                                          Browse
+                                          <input
+                                            type="file"
+                                            multiple
+                                            onChange={(e) =>
+                                              setImageFiles([...e.target.files])
+                                            }
+                                            className="hidden"
+                                          />
+                                        </label>
+                                        {imageFiles.length > 0 && (
+                                          <span className="text-sm text-gray-300">
+                                            {imageFiles.length} file(s) selected
+                                          </span>
+                                        )}
+                                      </div>
+
                                       <button
                                         onClick={handleImageUpload}
-                                        className="bg-blue-500 p-2 rounded-xl"
+                                        className="bg-green-600 hover:bg-green-700 mt-1 mx-3 p-3 rounded-xl"
                                       >
                                         Upload Lesson Images
                                       </button>
@@ -903,10 +985,10 @@ export default function CreatorDashboard({ searchParams }) {
                                             className="flex items-center justify-between bg-gray-500 rounded-xl py-4"
                                           >
                                             <div className="flex items-center gap-2">
-                                              <div className=" text-sm">
-                                                <span className="px-1">
+                                              <div className=" text-xs px-2">
+                                                {/* <span className="px-1">
                                                   {index + 1}.
-                                                </span>
+                                                </span> */}
                                                 <span className="px-1">
                                                   {less.title}
                                                 </span>
@@ -921,9 +1003,9 @@ export default function CreatorDashboard({ searchParams }) {
                                                   less._id
                                                 )
                                               }
-                                              className="bg-red-600 px-12 mx-4 py-3 rounded-md hover:bg-red-700 transition text-xs"
+                                              className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white rounded-full shadow-md transition duration-200 px-4 py-2 mx-2 "
                                             >
-                                              Delete
+                                              <MdDelete />
                                             </button>
                                           </div>
                                         ))

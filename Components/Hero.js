@@ -23,8 +23,8 @@ const Hero = ({ opacity, translate }) => {
         <button className="px-6 py-3 rounded-full bg-purple-500 hover:bg-purple-600 transition text-white font-semibold shadow-lg">
           Get Started
         </button>
-        <button className="px-6 py-3 rounded-full border border-white/50 hover:bg-white/10 transition text-white font-semibold shadow-lg">
-          <a href="/Course">Explore Courses</a>
+        <button onClick={()=>router.push('/Course')} className="px-6 py-3 rounded-full border border-white/50 hover:bg-white/10 transition text-white font-semibold shadow-lg">
+          Explore Courses
         </button>
       </div>
 

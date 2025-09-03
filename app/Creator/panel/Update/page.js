@@ -1,13 +1,14 @@
 "use client";
 import Loader from "@/Components/Loader/loader";
 import Uploader from "@/Components/Loader/UploadLoader";
+import { useRouter } from "next/navigation";
 
 import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 
 export default function CreatorDashboard({ searchParams }) {
   const [loading, setLoading] = useState(false);
-
+  const router = useRouter();
   const [token, setToken] = useState("");
   const [singleCourse, setSingleCourse] = useState([]);
   const [activeChapterId, setActiveChapterId] = useState(null);
@@ -69,9 +70,17 @@ export default function CreatorDashboard({ searchParams }) {
           key={course._id}
           className="bg-gray-800 p-6 min-h-dvh shadow space-y-5 border border-gray-700"
         >
-          <h2 className="text-2xl py-4 text-center font-semibold mb-2">
-            Update Course: {course.title}
-          </h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl py-4 text-center font-semibold mb-2">
+              Update Course: {course.title}
+            </h2>
+            <h2
+              className="text-xl font-semibold text-center  hover:text-blue-400 hover:underline  cursor-pointer 0 py-2"
+              onClick={() => router.push("/Creator/panel/View")}
+            >
+              View All Courses
+            </h2>
+          </div>
 
           <UpdateCourseForm
             course={course}
@@ -129,7 +138,7 @@ export default function CreatorDashboard({ searchParams }) {
                           className="w-full text-left px-3 py-2 flex justify-between items-center"
                         >
                           {index + 1}. {sub.title}
-                          <span>
+                          <span className="bg-gray-600 px-2 py-1 rounded hover:bg-gray-500">
                             {activeSubchapterId === sub._id ? "−" : "+"}
                           </span>
                         </button>
@@ -162,7 +171,7 @@ export default function CreatorDashboard({ searchParams }) {
                                   className="w-full text-left px-2 py-1 flex justify-between items-center"
                                 >
                                   {index + 1}. {lesson.title}
-                                  <span>
+                                  <span className="bg-gray-600 px-2 py-1 rounded hover:bg-gray-500">
                                     {activeLessonId === lesson._id ? "−" : "+"}
                                   </span>
                                 </button>
@@ -284,7 +293,11 @@ function UpdateCourseForm({ course, token, fetchOne, setLoading, loading }) {
             setLoading(false);
             const data = await res.json();
             if (data.updatedCourse) {
-              toast.success("Course updated");
+              toast.success("Course updated", {
+                pauseOnHover: false,
+                hideProgressBar: true,
+                autoClose: 1000,
+              });
               fetchOne(course._id);
             } else toast.error("Failed to update course");
           } catch {
@@ -343,7 +356,11 @@ function UpdateChapterForm({ courseId, chapter, fetchOne, setLoading }) {
             setLoading(false);
             const data = await res.json();
             if (data.updatedChapter) {
-              toast.success("Chapter updated");
+              toast.success("Chapter updated", {
+                pauseOnHover: false,
+                hideProgressBar: true,
+                autoClose: 1000,
+              });
               fetchOne(courseId);
             } else toast.error("Failed to update chapter");
           } catch {
@@ -408,7 +425,11 @@ function UpdateSubchapterForm({
             setLoading(false);
             const data = await res.json();
             if (data.updatedSubchapter) {
-              toast.success("Subchapter updated");
+              toast.success("Subchapter updated", {
+                pauseOnHover: false,
+                hideProgressBar: true,
+                autoClose: 1000,
+              });
               fetchOne(courseId);
             } else toast.error("Failed to update subchapter");
           } catch {
@@ -495,8 +516,9 @@ function UpdateLessonForm({
       const res = await fetchData.json();
       setForm((prev) => ({ ...prev, videoURL: res.secure_url }));
       toast.success("Video Uploaded Successfully", {
-        autoClose: 1000,
         pauseOnHover: false,
+        hideProgressBar: true,
+        autoClose: 1000,
       });
     }
   };
@@ -561,7 +583,7 @@ function UpdateLessonForm({
         {uploading && <Uploader />}
         <button
           onClick={handleUpload}
-          className="bg-blue-500 mx-5 p-2 rounded-xl"
+          className="bg-green-600 hover:bg-green-700 mx-5 p-2 rounded-xl"
         >
           Update Lesson Video
         </button>
@@ -582,7 +604,11 @@ function UpdateLessonForm({
             setLoading(false);
             const data = await res.json();
             if (data.updatedLesson) {
-              toast.success("Lesson updated");
+              toast.success("Lesson updated", {
+                pauseOnHover: false,
+                hideProgressBar: true,
+                autoClose: 1000,
+              });
               fetchOne(courseId);
             } else toast.error("Failed to update lesson");
           } catch {
