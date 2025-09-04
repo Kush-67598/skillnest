@@ -16,7 +16,7 @@ export async function POST(req) {
     email: email,
     status: "pending",
     amount: amount,
-    phone: phone,
+    phone: phone ||0,
     course: c_id,
   });
   await CreateTransaction.save();

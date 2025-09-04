@@ -4,20 +4,39 @@ import { useRouter } from "next/navigation";
 import Script from "next/script";
 import React, { useState, useEffect } from "react";
 export default function OrderPage({ params }) {
-  // const unwrapped = React.use(params); // unwrap promise
-  // const courseId = unwrapped.courseId;
-  const courseId = params.courseId; // this will work correctly
-  console.log(courseId);
+  const unwrapped = React.use(params); // unwrap promise
+  const courseId = unwrapped.courseId;
   const [Course, setCourse] = useState(null);
   const [token, setToken] = useState(null);
   const router = useRouter();
+  // useEffect(() => {
+  //   if (!token) return; // wait for token
+  //   FetchSingleCourse();
+  // }, [token]);
   useEffect(() => {
-    if (!token) return; // wait for token
-    FetchSingleCourse();
-  }, [token]);
+    const fetchUser = async () => {
+      const token = localStorage.getItem("USER_TOKEN");
+      if (!token) return;
+
+      setToken(token);
+
+      const response = await fetch("/api/User", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const res = await response.json();
+      setName(res.name || "");
+      setEmail(res.email || "");
+      setPhone("");
+    };
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("USER_TOKEN");
+
     if (!token) return;
 
     const FetchSingleCourse = async () => {
@@ -100,8 +119,11 @@ export default function OrderPage({ params }) {
           if (res.success) {
             router.push(`/Course/${Course._id}`);
           }
-        } else {
+        } else if (!res.success) {
           toast.error("Payment failed or could not be verified.");
+          setTimeout(() => {
+            router.push(`/Course/${Course._id}`);
+          }, 2000);
         }
       },
       prefill: {
@@ -154,16 +176,18 @@ export default function OrderPage({ params }) {
                       <input
                         type="text"
                         placeholder="Full Name"
+                        disabled={true}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full p-2 rounded bg-gray-700 text-gray-100 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full hover:cursor-not-allowed p-2 rounded bg-gray-700 text-gray-100 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                       <input
                         type="email"
                         placeholder="Email"
                         value={email}
+                        disabled={true}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-2 rounded bg-gray-700 text-gray-100 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full hover:cursor-not-allowed p-2 rounded bg-gray-700 text-gray-100 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                       <input
                         type="tel"
@@ -177,7 +201,7 @@ export default function OrderPage({ params }) {
                     {/* Payment Button */}
                     <button
                       onClick={handlePayment}
-                      disabled={!name || !email || !phone || !Course}
+                      disabled={!name || !email || !Course}
                       className="w-full bg-purple-600 hover:bg-purple-400 cursor-pointer py-3 rounded text-white font-semibold  mt-4"
                     >
                       Pay Now

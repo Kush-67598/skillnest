@@ -10,8 +10,8 @@ export default function SingleCourseCard({ course }) {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0); // track actual progress
   const [token, setToken] = useState(null);
+
   const [paidCourseUser, setPaidCourseUser] = useState(null);
-  console.log(paidCourseUser);
   useEffect(() => {
     const t = localStorage.getItem("USER_TOKEN");
     if (!t) return;
@@ -27,9 +27,6 @@ export default function SingleCourseCard({ course }) {
     fetchUser();
   }, []);
   const router = useRouter();
-
-  if (paidCourseUser && paidCourseUser.includes(course._id)) {
-  }
 
   // count total lessons
   const Count_chapter = course.chapters.length;
@@ -90,54 +87,56 @@ export default function SingleCourseCard({ course }) {
 
     setLoading(true);
 
-    if (
-      course.price &&
-      course.price !== 0 &&
-      paidCourseUser &&
-      paidCourseUser.includes(course._id)
-    ) {
-      router.push(`/Course/${course._id}/chapters`);
-      toast.success("Course Continues", {
-        autoClose: 1000,
-        pauseOnHover: false,
-        hideProgressBar: true,
-      });
+    try {
+      if (
+        course.price &&
+        course.price !== 0 &&
+        paidCourseUser &&
+        paidCourseUser.includes(course._id)
+      ) {
+        router.push(`/Course/${course._id}/chapters`);
+        toast.success("Course Continues", {
+          autoClose: 1000,
+          pauseOnHover: false,
+          hideProgressBar: true,
+        });
+        return;
+      } else if (
+        course.price &&
+        course.price !== 0 &&
+        paidCourseUser &&
+        !paidCourseUser.includes(course._id)
+      ) {
+        router.push(`/Course/${course._id}/Orders`);
+        return;
+      } else if (course.price === 0) {
+        const enrolledcourse = await fetch(
+          `${process.env.NEXT_PUBLIC_API}/api/enrolledCourse`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ courseId: course._id }),
+          }
+        );
+        const res = await enrolledcourse.json();
+        if (res.success) {
+          router.push(`/Course/${course._id}/chapters`);
+          toast.success("Enrollment Successful", {
+            autoClose: 1000,
+            pauseOnHover: false,
+            hideProgressBar: true,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error enrolling:", error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
       setLoading(false);
-      return;
-    } else if (
-      course.price &&
-      course.price !== 0 &&
-      paidCourseUser &&
-      !paidCourseUser.includes(course._id)
-    ) {
-      router.push(`/Course/${course._id}/Orders`);
     }
-    // const enrolledcourse = await fetch(
-    //         `${process.env.NEXT_PUBLIC_API}/api/enrolledCourse`,
-    //         {
-    //           method: "POST",
-    //           headers: {
-    //             Authorization: `Bearer ${token}`,
-    //             "Content-Type": "application/json",
-    //           },
-    //           body: JSON.stringify({ courseId: course._id }),
-    //         }
-    //       );
-    //   const res = await enrolledcourse.json();
-    //   if (!enrolledcourse.ok)
-    //     throw new Error(res.message || "Failed to enroll");
-
-    //   // toast.success("Enrolled successfully!", {
-    //   //   pauseOnHover: false,
-    //   //   autoClose: 1000,
-    //   //   hideProgressBar: true,
-    //   // });
-    //   // router.push(`/Course/${course._id}/chapters`);
-    // } catch (err) {
-    //   toast.error(err.message);
-    // } finally {
-    //   setLoading(false);
-    // }
   };
 
   return (

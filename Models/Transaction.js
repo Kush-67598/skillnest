@@ -6,7 +6,7 @@ const TransactionSchema = new mongoose.Schema({
   email: { type: String, required: true },
   status: { type: String, required: true },
   amount: { type: String, required: true },
-  phone: { type: Number, required: true },
+  phone: { type: Number },
   course: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "course",

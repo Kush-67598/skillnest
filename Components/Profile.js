@@ -13,8 +13,9 @@ import {
   FaSignOutAlt,
   FaUserEdit,
 } from "react-icons/fa";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Loader from "./Loader/loader";
+import useCheckView from "@/Hooks/useCheckView";
 
 export default function ProfilePage({ user }) {
   const [POTDData, setPOTDData] = useState({
@@ -22,7 +23,9 @@ export default function ProfilePage({ user }) {
     Answer: "",
     Difficulty: "",
   });
-
+  const isMobile = useCheckView();
+  const pathname = usePathname();
+  const Profile = pathname.includes("/Profile");
   const [UserData, setUserData] = useState({});
   const [pro, setIsPro] = useState({});
   useEffect(() => {
@@ -132,7 +135,7 @@ export default function ProfilePage({ user }) {
       )}
       <ToastContainer />
 
-      <div className="min-h-screen bg-gradient-to-tr from-gray-950 via-gray-900 to-black text-white px-6 py-10 flex justify-center">
+      <div className={`min-h-screen ${isMobile && Profile ?'-mt-20':''} bg-gradient-to-tr from-gray-950 via-gray-900 to-black text-white px-6 py-10 flex justify-center`}>
         <div className="w-full max-w-5xl grid md:grid-cols-3 gap-8">
           {/* Left Profile Section */}
           <div className="bg-gray-800/60 border border-gray-700 rounded-2xl shadow-lg p-6 flex flex-col items-center text-center space-y-4">

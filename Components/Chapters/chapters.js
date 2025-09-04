@@ -1,5 +1,6 @@
 "use client";
-import { useRouter } from "next/navigation";
+
+import { usePathname, useRouter } from "next/navigation";
 import { IoIosCheckmarkCircle } from "react-icons/io";
 import React, { useEffect, useState } from "react";
 import Loader from "@/Components/Loader/loader";
@@ -8,10 +9,94 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function ChaptersPage({ chapters, courseId }) {
   const router = useRouter();
-  const [completed, setCompleted] = useState([]);
-  const [subchapterCounts, setSubchapterCounts] = useState({}); // chapterId => completed subchapters
-  const [loading, setLoading] = useState(false);
+  const pathname = usePathname();
 
+  // state
+  const [course, setCourse] = useState(null);
+  const [authorized, setAuthorized] = useState(false);
+  const [completed, setCompleted] = useState([]);
+  const [subchapterCounts, setSubchapterCounts] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  // ✅ Fetch course details
+  const fetchCourse = async () => {
+    try {
+      const token = localStorage.getItem("USER_TOKEN");
+      if (!token) {
+        toast.error("Please login to access this course");
+        router.replace("/auth/login");
+        return;
+      }
+
+      const resp = await fetch(`/api/Course/${courseId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || "Failed to fetch course");
+
+      setCourse(data.reqCourse); // ✅ correct field
+    } catch (err) {
+      toast.error(err.message || "Failed to load course");
+      router.replace("/Course");
+    }
+  };
+
+  // ✅ Check access once course is loaded
+  const checkAccess = async () => {
+    if (!course) return;
+
+    try {
+      const token = localStorage.getItem("USER_TOKEN");
+      if (!token) {
+        toast.error("Please login to access this course");
+        router.replace("/auth/login");
+        return;
+      }
+
+      // free course → allow directly
+      if (course.price === 0) {
+        setAuthorized(true);
+        return;
+      }
+
+      // paid course → check user
+      const resp = await fetch("/api/User", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const res = await resp.json();
+
+      if (res.premiumCourseID?.includes(courseId)) {
+        setAuthorized(true);
+      } else {
+        toast.error("Unauthorized 🚫 You are not enrolled in this course", {
+          autoClose: 1000,
+          pauseOnHover: false,
+          hideProgressBar: true,
+        });
+        router.replace("/Course");
+      }
+    } catch (err) {
+      toast.error(err.message || "Failed to verify access");
+      router.replace("/Course");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Fetch course first
+  useEffect(() => {
+    fetchCourse();
+  }, [courseId]);
+
+  // ✅ Run access check when course or path changes
+  useEffect(() => {
+    if (course) checkAccess();
+  }, [pathname, course]);
+
+  // ✅ Progress fetching
   const getCompleted = async () => {
     setLoading(true);
     try {
@@ -32,8 +117,6 @@ export default function ChaptersPage({ chapters, courseId }) {
         counts[ch._id] = count;
       });
       setSubchapterCounts(counts);
-
-      // toast.success({pauseOnHover:false,autoClose:1000},"Progress loaded successfully!");
     } catch (err) {
       toast.error(err.message || "Failed to load progress");
     } finally {
@@ -41,6 +124,7 @@ export default function ChaptersPage({ chapters, courseId }) {
     }
   };
 
+  // ✅ Mark completed
   const markChapterCompleted = async (chapterId) => {
     setLoading(true);
     try {
@@ -67,10 +151,12 @@ export default function ChaptersPage({ chapters, courseId }) {
   };
 
   useEffect(() => {
-    getCompleted();
-  }, []);
+    if (authorized) getCompleted();
+  }, [authorized]);
 
-  if (loading) return <Loader />; // show loader while fetching
+  // ✅ loading or unauthorized
+  if (loading || !course) return <Loader />;
+  if (!authorized) return null;
 
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-6 mt-10">
@@ -112,7 +198,7 @@ export default function ChaptersPage({ chapters, courseId }) {
 
                   <p className="text-xs sm:text-sm mt-1">
                     {chapter.subChapters.length > 0 &&
-                    subchapterCounts[chapter._id] != undefined
+                    subchapterCounts[chapter._id] !== undefined
                       ? Math.floor(
                           (subchapterCounts[chapter._id] /
                             chapter.subChapters.length) *
@@ -149,7 +235,6 @@ export default function ChaptersPage({ chapters, courseId }) {
                         chapterId: chapter._id,
                       }),
                     });
-                    // toast.success({pauseOnHover:false,autoClose:1000},"Tracking updated!");
                     router.push(
                       `/Course/${courseId}/chapters/${chapter._id}/subchapters`
                     );
