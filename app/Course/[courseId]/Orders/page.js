@@ -1,12 +1,16 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import Script from "next/script";
 import React, { useState, useEffect } from "react";
 export default function OrderPage({ params }) {
-  const unwrapped = React.use(params); // unwrap promise
-  const courseId = unwrapped.courseId;
+  // const unwrapped = React.use(params); // unwrap promise
+  // const courseId = unwrapped.courseId;
+  const courseId = params.courseId; // this will work correctly
+  console.log(courseId);
   const [Course, setCourse] = useState(null);
   const [token, setToken] = useState(null);
+  const router = useRouter();
   useEffect(() => {
     if (!token) return; // wait for token
     FetchSingleCourse();
@@ -71,8 +75,11 @@ export default function OrderPage({ params }) {
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_order_id: response.razorpay_order_id,
             razorpay_signature: response.razorpay_signature,
-            email: email, // from your component state
+            email: email,
+            courseId: Course._id, // from your component state
           }),
+        }).then(() => {
+          router.push(`/Course/${courseId}/chapters`);
         });
       },
       prefill: {
@@ -148,7 +155,7 @@ export default function OrderPage({ params }) {
                     {/* Payment Button */}
                     <button
                       onClick={handlePayment}
-                      disabled={!name || !email || !phone}
+                      disabled={!name || !email || !phone  || !Course}
                       className="w-full bg-purple-600 hover:bg-purple-400 cursor-pointer py-3 rounded text-white font-semibold  mt-4"
                     >
                       Pay Now

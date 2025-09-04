@@ -21,6 +21,7 @@ const UserSchema = new mongoose.Schema({
       expiresAt: { type: Date, required: true },
     },
   ],
+  premiumCourseID: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
 
   profileImg: { type: String },
   bio: { type: String },
