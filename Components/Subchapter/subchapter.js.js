@@ -78,6 +78,7 @@ export default function SubchapterPage({ subChapters, courseId, chapterId }) {
       <h1 className="text-3xl sm:text-4xl font-bold text-center bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 text-transparent bg-clip-text mb-8 sm:mb-10">
         🧩 Explore Subchapters
       </h1>
+      {subChapters.length==0 && <div>No Subchapters to Show</div>}
 
       <button
         onClick={() => router.push(`/Course/${courseId}/chapters`)}

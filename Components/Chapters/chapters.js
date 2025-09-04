@@ -163,6 +163,7 @@ export default function ChaptersPage({ chapters, courseId }) {
       <h1 className="text-3xl sm:text-4xl font-bold text-center bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 text-transparent bg-clip-text mb-8 sm:mb-10">
         📚 Explore Chapters
       </h1>
+      {chapters.length == 0 && <div>No Chapters to Show</div>}
 
       <div className="flex flex-col gap-4">
         {chapters.map((chapter) => (

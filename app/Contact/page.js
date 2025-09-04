@@ -1,4 +1,6 @@
 "use client";
+import useCheckView from "@/Hooks/useCheckView";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
@@ -8,6 +10,9 @@ export default function ContactPage() {
     email: "",
     message: "",
   });
+  const isMobile = useCheckView();
+  const pathname = usePathname();
+  const Contact = pathname.includes("/Contact");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -52,7 +57,11 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4 py-12">
+    <div
+      className={`min-h-screen ${
+        isMobile && Contact ? "-mt-16" : ""
+      } bg-gray-900 flex items-center justify-center px-4 py-12`}
+    >
       <div className="max-w-3xl w-full bg-gray-800/80 backdrop-blur-md rounded-3xl p-10 shadow-2xl border border-gray-700">
         <h1 className="text-4xl font-extrabold text-white mb-6 text-center">
           Get in Touch

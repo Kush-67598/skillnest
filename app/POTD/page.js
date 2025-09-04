@@ -1,5 +1,6 @@
 "use client";
 
+import Loader from "@/Components/Loader/loader";
 import { useEffect, useState } from "react";
 
 export default function Test() {
@@ -7,6 +8,7 @@ export default function Test() {
   const [result, setResult] = useState(null);
   const [correct, setCorrect] = useState(null);
   const [problemData, setProblemData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (correct === null) return; // 🚫 skip if not determined yet
@@ -29,14 +31,19 @@ export default function Test() {
   }, []);
 
   const userFetch = async () => {
-    const res = await fetch("/api/User", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("USER_TOKEN")}`,
-      },
-    });
-
-    const response = await res.json();
-    setProblemData(response.POTD);
+    setLoading(true);
+    try {
+      const res = await fetch("/api/User", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("USER_TOKEN")}`,
+        },
+      });
+      const response = await res.json();
+      setProblemData(response.POTD);
+    } catch (err) {
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleUpload = async () => {
@@ -48,17 +55,22 @@ export default function Test() {
     reader.readAsDataURL(file);
     reader.onload = async () => {
       const base64 = reader.result.split(",")[1];
-
-      const res = await fetch("/api/Groq/HandleImages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imageBase64: base64,
-          question: problemData[0].Question,
-        }),
-      });
-      const data = await res.json();
-      setResult(data.result);
+      setLoading(true);
+      try {
+        const res = await fetch("/api/Groq/HandleImages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            imageBase64: base64,
+            question: problemData[0].Question,
+          }),
+        });
+        const data = await res.json();
+        setResult(data.result);
+      } catch {
+      } finally {
+        setLoading(false);
+      }
     };
   };
   useEffect(() => {
@@ -72,6 +84,7 @@ export default function Test() {
 
   return (
     <>
+      {loading && <Loader />}
       <div className="min-h-screen bg-gray-900 px-6  -mt-20 py-10 flex items-center justify-center">
         <div className="w-full max-w-full grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left - Questions */}
@@ -147,21 +160,6 @@ export default function Test() {
               />
             </div>
 
-            {/* Prompt Input */}
-            {/* <div>
-            <label className="block text-gray-300 mb-2 text-sm font-medium">
-              Enter Prompt
-            </label>
-            <input
-              type="text"
-              className="w-full p-3 rounded-xl border border-gray-600 bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              placeholder="Type your description..."
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-            />
-          </div> */}
-
-            {/* Button */}
             <button
               onClick={handleUpload}
               className="w-full py-3 bg-purple-600 hover:bg-purple-500 rounded-xl text-white font-semibold shadow-md transition"

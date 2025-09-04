@@ -78,7 +78,8 @@ export default function AllLessonsPage({
         await getCompleted();
         toast.success("Subchapter completed!", {
           pauseOnHover: false,
-          autoClose: 1000,hideProgressBar:true,
+          autoClose: 1000,
+          hideProgressBar: true,
         });
       }
     } catch (err) {
@@ -100,6 +101,7 @@ export default function AllLessonsPage({
         📘 Explore Lessons
       </h1>
 
+      {lessons.length == 0 && <div>No Lessons to Show</div>}
       <button
         onClick={() =>
           router.push(`/Course/${courseId}/chapters/${chapterId}/subchapters`)

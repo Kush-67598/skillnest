@@ -29,7 +29,9 @@ export default function AuthForm({ type }) {
         if (data.success) {
           localStorage.setItem("USER_TOKEN", data.token);
           toast.success("Logged in with Google!", { autoClose: 1200 });
-          router.push("/");
+          setTimeout(() => {
+            router.push("/");
+          }, 1200);
         } else {
           toast.error(data.error || "Google login failed");
         }
@@ -70,10 +72,14 @@ export default function AuthForm({ type }) {
         if (type === "login") {
           localStorage.setItem("USER_TOKEN", res.token);
           toast.success("Successfully Logged In", { autoClose: 1200 });
-          router.push("/");
+          setTimeout(() => {
+            router.push("/");
+          }, 1200);
         } else {
           toast.success("Account Created Successfully", { autoClose: 1200 });
-          router.push("/auth/login");
+          setTimeout(() => {
+            router.push("/auth/login");
+          }, 1200);
         }
       } else {
         toast.error(res.message || "Something went wrong", { autoClose: 1200 });

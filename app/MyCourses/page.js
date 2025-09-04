@@ -1,15 +1,19 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import useCheckView from "@/Hooks/useCheckView";
 
 export default function MyCoursesPage() {
+  const isMobile = useCheckView();
   const [token, setToken] = useState(null);
   const [myCourses, setMyCourses] = useState([]);
   const [track, setTrack] = useState([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const MyCourses = pathname.includes("/MyCourses");
 
   const finalUrl = (courseId, chapterId, subchapterId, lessonId) => {
     let url = `/Course/${courseId}`;
@@ -62,7 +66,11 @@ export default function MyCoursesPage() {
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 py-12 px-4">
+    <div
+      className={`min-h-screen ${
+        MyCourses && isMobile ? "-mt-16 -mb-24" : ""
+      } bg-gradient-to-b from-gray-900 via-black to-gray-800 py-12 px-4`}
+    >
       <h1 className="text-5xl font-extrabold text-center text-white mb-12 drop-shadow-lg">
         🎓 My Courses
       </h1>
