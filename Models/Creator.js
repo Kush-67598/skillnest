@@ -2,9 +2,15 @@ import mongoose from "mongoose";
 const CreatorSchema = new mongoose.Schema({
   creatorName: { type: String },
   email: { type: String, required: true, unique: true },
-  password:{type:String,required:true},
-  courses:[{type:mongoose.Schema.Types.ObjectId,ref:"Course"}]
+  password: {
+    type: String,
+    required: function () {
+      return !this.googleId; // password only required if not using Google OAuth
+    },
+  },
+  googleId: { type: String }, // <-- add this
+  courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
 });
 
-export default mongoose.models.User || mongoose.model("Creator", CreatorSchema);
+export default mongoose.models.Creator || mongoose.model("Creator", CreatorSchema);
 mongoose.models = {};

@@ -27,18 +27,18 @@ export async function POST(req) {
 
       if (!model) {
         const createCreator = new Creator({
-          name: payload.name,
-          username: `@${payload.name.split(" ")[0]}${Math.floor(
-            Math.random() * 54000
-          )}`,
+          creatorName: payload.name,
+
           email: payload.email,
           googleId: payload.sub,
-          profileImg: payload.picture || "",
-          bio: "",
         });
         await createCreator.save();
         token = jwt.sign(
-          { user_id: createCreator._id, name: payload.name, email: payload.email },
+          {
+            user_id: createCreator._id,
+            name: payload.name,
+            email: payload.email,
+          },
           "jwtsecret"
         );
         return NextResponse.json({
