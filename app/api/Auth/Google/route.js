@@ -3,11 +3,13 @@ import { OAuth2Client } from "google-auth-library";
 import User from "@/Models/User";
 import Creator from "@/Models/Creator";
 import jwt from "jsonwebtoken";
+import { ConnectDB } from "@/Hooks/useConnectDB";
 
 const client = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 
 export async function POST(req) {
   try {
+    await ConnectDB();
     const body = await req.text();
     const params = new URLSearchParams(body);
     const credential = params.get("credential");

@@ -13,4 +13,3 @@ const CreatorSchema = new mongoose.Schema({
 });
 
 export default mongoose.models.Creator || mongoose.model("Creator", CreatorSchema);
-mongoose.models = {};
