@@ -18,7 +18,7 @@ export default function CreatorSignup() {
   useEffect(() => {
     window.google_response = async (response) => {
       try {
-        const res = await fetch("/api/CreatorAuth/Google", {
+        const res = await fetch("/api/Auth/Google", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: new URLSearchParams({
@@ -175,7 +175,7 @@ export default function CreatorSignup() {
             <Script src="https://accounts.google.com/gsi/client" async defer />
             <div
               id="g_id_onload"
-              data-client_id={process.env.NEXT_PUBLIC_CLIENT_ID}
+              data-client_id={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
               data-context="signup"
               data-ux_mode="popup"
               data-callback="google_response"

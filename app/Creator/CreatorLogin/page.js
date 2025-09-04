@@ -1,19 +1,56 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import Script from "next/script";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function CreatorSignup() {
+export default function CreatorLogin() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    window.google_response = async (response) => {
+      try {
+        const res = await fetch("/api/Auth/Google", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            credential: response.credential,
+            type: "creator",
+          }),
+        });
 
+        const data = await res.json();
+
+        if (data.success) {
+          localStorage.setItem("Token", data.token);
+          toast.success("Logged in with Google!", {
+            autoClose: 1200,
+            pauseOnHover: false,
+            hideProgressBar: true,
+          });
+          router.push("/Creator/panel/View");
+        } else {
+          toast.error(data.error || "Google signup failed", {
+            autoClose: 1500,
+            pauseOnHover: false,
+            hideProgressBar: true,
+          });
+        }
+      } catch (err) {
+        toast.error("Something went wrong", {
+          autoClose: 1500,
+          pauseOnHover: false,
+          hideProgressBar: true,
+        });
+      }
+    };
+  }, []);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -61,7 +98,7 @@ export default function CreatorSignup() {
         <div className="w-full max-w-5xl bg-gradient-to-br  to-indigo-800/80 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 text-white">
           <h2 className="text-3xl font-bold text-center mb-4">Creator Login</h2>
           <p className="text-gray-300 text-center mb-6">
-            Create your Creator account and start sharing your content.
+            Log in to your Creator account.
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -115,7 +152,7 @@ export default function CreatorSignup() {
             <Script src="https://accounts.google.com/gsi/client" async defer />
             <div
               id="g_id_onload"
-              data-client_id={process.env.NEXT_PUBLIC_CLIENT_ID}
+              data-client_id={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
               data-context="signup"
               data-ux_mode="popup"
               data-callback="google_response"
