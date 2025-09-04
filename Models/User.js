@@ -27,8 +27,8 @@ const UserSchema = new mongoose.Schema({
   bio: { type: String },
   courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
   googleId: { type: String },
-  pro: { type: Boolean, default: false }, // whether user is pro
-  proClaimedAt: { type: Date }, // when they activated
+  pro: { type: Boolean, default: false }, 
+  proClaimedAt: { type: Date },
   proExpiresAt: { type: Date },
 });
 

@@ -46,7 +46,7 @@ export default function OrderPage({ params }) {
   }, [Course]);
 
   const [submitted, setSubmitted] = useState(false);
-
+  console.log(c_id);
   const handlePayment = async () => {
     const txn = await fetch("/api/txn", {
       body: JSON.stringify({ name, email, phone, amount, c_id }),
@@ -64,23 +64,45 @@ export default function OrderPage({ params }) {
       name: "SkillNest", //your business name
       description: "Test Transaction",
       image: "https://example.com/your_logo",
-      order_id: res.razor.id, // This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-      // callback_url: "http://localhost:3000/api/payments",
-      handler: function (response) {
+      order_id: res.razor.id,
+      handler: async function (response) {
         console.log(response);
-        fetch(`${process.env.NEXT_PUBLIC_API}/api/payments`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-            email: email,
-            courseId: Course._id, // from your component state
-          }),
-        }).then(() => {
-          router.push(`/Course/${courseId}/chapters`);
-        });
+
+        const paymentRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API}/api/payments`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              email: email,
+              courseId: Course._id, // from your component state
+            }),
+          }
+        );
+        const paymentData = await paymentRes.json();
+        console.log("paymentData", paymentData);
+        if (paymentData.success) {
+          const enrolledRes = await fetch(
+            `${process.env.NEXT_PUBLIC_API}/api/enrolledCourse`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("USER_TOKEN")}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ courseId: Course._id }),
+            }
+          );
+          const res = await enrolledRes.json();
+          if (res.success) {
+            router.push(`/Course/${Course._id}`);
+          }
+        } else {
+          toast.error("Payment failed or could not be verified.");
+        }
       },
       prefill: {
         //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
@@ -155,7 +177,7 @@ export default function OrderPage({ params }) {
                     {/* Payment Button */}
                     <button
                       onClick={handlePayment}
-                      disabled={!name || !email || !phone  || !Course}
+                      disabled={!name || !email || !phone || !Course}
                       className="w-full bg-purple-600 hover:bg-purple-400 cursor-pointer py-3 rounded text-white font-semibold  mt-4"
                     >
                       Pay Now

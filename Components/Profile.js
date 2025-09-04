@@ -47,9 +47,6 @@ export default function ProfilePage({ user }) {
   const fileInputRef = useRef(null);
   const router = useRouter();
 
-  if (!UserData || Object.keys(UserData).length === 0) {
-    return <Loader />;
-  }
   const POTDGROQ = async () => {
     setLoading(true);
     const response = await fetch("/api/Groq/POTDQuestion", { method: "POST" });

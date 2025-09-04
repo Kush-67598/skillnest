@@ -10,8 +10,26 @@ export default function SingleCourseCard({ course }) {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0); // track actual progress
   const [token, setToken] = useState(null);
-
+  const [paidCourseUser, setPaidCourseUser] = useState(null);
+  console.log(paidCourseUser);
+  useEffect(() => {
+    const t = localStorage.getItem("USER_TOKEN");
+    if (!t) return;
+    const fetchUser = async () => {
+      const response = await fetch("/api/User", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("USER_TOKEN")}`,
+        },
+      });
+      const res = await response.json();
+      setPaidCourseUser(res.premiumCourseID);
+    };
+    fetchUser();
+  }, []);
   const router = useRouter();
+
+  if (paidCourseUser && paidCourseUser.includes(course._id)) {
+  }
 
   // count total lessons
   const Count_chapter = course.chapters.length;
@@ -44,13 +62,16 @@ export default function SingleCourseCard({ course }) {
         );
         const data = await resp.json();
 
-        if (!resp.ok) throw new Error(data.message || "Failed to load progress");
+        if (!resp.ok)
+          throw new Error(data.message || "Failed to load progress");
 
         // if API returns completed lessons
         const completedLessons = data.progress?.completedLessons?.length || 0;
 
         const percent =
-          countLessons > 0 ? Math.round((completedLessons / countLessons) * 100) : 0;
+          countLessons > 0
+            ? Math.round((completedLessons / countLessons) * 100)
+            : 0;
 
         setProgress(percent);
       } catch (err) {
@@ -69,40 +90,54 @@ export default function SingleCourseCard({ course }) {
 
     setLoading(true);
 
-    if (course.price && course.price !== 0) {
-      router.push(`/Course/${course._id}/Orders`);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const enrolledcourse = await fetch(
-        `${process.env.NEXT_PUBLIC_API}/api/enrolledCourse`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ courseId: course._id }),
-        }
-      );
-
-      const res = await enrolledcourse.json();
-      if (!enrolledcourse.ok)
-        throw new Error(res.message || "Failed to enroll");
-
-      toast.success("Enrolled successfully!", {
-        pauseOnHover: false,
+    if (
+      course.price &&
+      course.price !== 0 &&
+      paidCourseUser &&
+      paidCourseUser.includes(course._id)
+    ) {
+      router.push(`/Course/${course._id}/chapters`);
+      toast.success("Course Continues", {
         autoClose: 1000,
+        pauseOnHover: false,
         hideProgressBar: true,
       });
-      router.push(`/Course/${course._id}/chapters`);
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
       setLoading(false);
+      return;
+    } else if (
+      course.price &&
+      course.price !== 0 &&
+      paidCourseUser &&
+      !paidCourseUser.includes(course._id)
+    ) {
+      router.push(`/Course/${course._id}/Orders`);
     }
+    // const enrolledcourse = await fetch(
+    //         `${process.env.NEXT_PUBLIC_API}/api/enrolledCourse`,
+    //         {
+    //           method: "POST",
+    //           headers: {
+    //             Authorization: `Bearer ${token}`,
+    //             "Content-Type": "application/json",
+    //           },
+    //           body: JSON.stringify({ courseId: course._id }),
+    //         }
+    //       );
+    //   const res = await enrolledcourse.json();
+    //   if (!enrolledcourse.ok)
+    //     throw new Error(res.message || "Failed to enroll");
+
+    //   // toast.success("Enrolled successfully!", {
+    //   //   pauseOnHover: false,
+    //   //   autoClose: 1000,
+    //   //   hideProgressBar: true,
+    //   // });
+    //   // router.push(`/Course/${course._id}/chapters`);
+    // } catch (err) {
+    //   toast.error(err.message);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   return (
@@ -154,9 +189,7 @@ export default function SingleCourseCard({ course }) {
             <span className="text-green-400 text-2xl">🎬</span>
             <div>
               <p className="text-gray-300 text-sm">Lessons</p>
-              <p className="text-white font-semibold text-lg">
-                {countLessons}
-              </p>
+              <p className="text-white font-semibold text-lg">{countLessons}</p>
             </div>
           </div>
         </div>
@@ -179,7 +212,9 @@ export default function SingleCourseCard({ course }) {
               : "bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:brightness-110"
           } text-white px-6 py-3 rounded-xl transition font-semibold shadow-md hover:shadow-lg`}
         >
-          {loading ? "Processing..." : "🚀 Enroll Now"}
+          {loading || paidCourseUser?.includes(course._id)
+            ? "Continue"
+            : "🚀 Enroll Now"}
         </button>
       </div>
 

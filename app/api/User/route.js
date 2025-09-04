@@ -21,7 +21,8 @@ export async function GET(req) {
     profileImg: u.profileImg || "",
     POTD: u.POTD,
     googleId: u.googleId,
-    pro:u.pro,
+    pro: u.pro,
+    premiumCourseID: u.premiumCourseID,
     success: true,
   });
 }
