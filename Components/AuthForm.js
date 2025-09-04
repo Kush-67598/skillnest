@@ -21,7 +21,10 @@ export default function AuthForm({ type }) {
         const res = await fetch("/api/Auth/Google", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({ credential: response.credential }),
+          body: new URLSearchParams({
+            credential: response.credential,
+            type: "user",
+          }),
         });
 
         const data = await res.json();

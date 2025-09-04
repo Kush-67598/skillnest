@@ -24,7 +24,7 @@ export default function CreatorLogin() {
             type: "creator",
           }),
         });
-
+        
         const data = await res.json();
 
         if (data.success) {
