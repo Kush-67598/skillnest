@@ -6,15 +6,17 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Script from "next/script";
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function AuthForm({ type }) {
   const [token, setToken] = useState(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // ✅ password toggle
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
+  // Google callback
   useEffect(() => {
     window.google_response = async (response) => {
       try {
@@ -32,9 +34,7 @@ export default function AuthForm({ type }) {
         if (data.success) {
           localStorage.setItem("USER_TOKEN", data.token);
           toast.success("Logged in with Google!", { autoClose: 1200 });
-          setTimeout(() => {
-            router.push("/");
-          }, 1200);
+          setTimeout(() => router.push("/"), 1200);
         } else {
           toast.error(data.error || "Google login failed");
         }
@@ -44,11 +44,28 @@ export default function AuthForm({ type }) {
     };
   }, []);
 
+  // Redirect if already logged in
   useEffect(() => {
     const token = localStorage.getItem("USER_TOKEN");
-    if (token) {
-      router.replace("/");
-    }
+    if (token) router.replace("/");
+  }, []);
+
+  // Render Google button immediately
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (window.google?.accounts?.id && document.getElementById("google-signin-btn")) {
+        window.google.accounts.id.initialize({
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+          callback: window.google_response,
+        });
+        window.google.accounts.id.renderButton(
+          document.getElementById("google-signin-btn"),
+          { theme: "outline", size: "large", width: 250 }
+        );
+        clearInterval(interval);
+      }
+    }, 100);
+    return () => clearInterval(interval);
   }, []);
 
   const formSubmit = async (e) => {
@@ -75,14 +92,10 @@ export default function AuthForm({ type }) {
         if (type === "login") {
           localStorage.setItem("USER_TOKEN", res.token);
           toast.success("Successfully Logged In", { autoClose: 1200 });
-          setTimeout(() => {
-            router.push("/");
-          }, 1200);
+          setTimeout(() => router.push("/"), 1200);
         } else {
           toast.success("Account Created Successfully", { autoClose: 1200 });
-          setTimeout(() => {
-            router.push("/auth/login");
-          }, 1200);
+          setTimeout(() => router.push("/auth/login"), 1200);
         }
       } else {
         toast.error(res.message || "Something went wrong", { autoClose: 1200 });
@@ -96,9 +109,9 @@ export default function AuthForm({ type }) {
     <>
       <ToastContainer position="top-right" theme="dark" />
 
-      {!token ? (
-        <div className=" flex items-center justify-center bg-gradient-to-br">
-          <div className=" max-w-[90vw] bg-gradient-to-br   from-purple-900 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-10 text-white">
+      {!token && (
+        <div className="flex items-center justify-center bg-gradient-to-br min-h-screen px-4">
+          <div className="max-w-[90vw] bg-gradient-to-br from-purple-900 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-10 text-white">
             <h2 className="text-4xl font-bold text-center mb-6">
               {type === "login" ? "Welcome Back 👋" : "Create an Account 🚀"}
             </h2>
@@ -129,7 +142,6 @@ export default function AuthForm({ type }) {
                 className="px-4 py-3 bg-white/10 text-white placeholder-gray-400 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
 
-              {/* Password Input with Toggle */}
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -144,7 +156,7 @@ export default function AuthForm({ type }) {
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                 >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}{" "}
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
 
@@ -162,23 +174,12 @@ export default function AuthForm({ type }) {
               <div className="flex-1 h-px bg-white/20"></div>
             </div>
 
-            <div className="flex justify-center">
-              <Script
-                src="https://accounts.google.com/gsi/client"
-                async
-                defer
-              />
-              <div
-                id="g_id_onload"
-                data-client_id={process.env.NEXT_PUBLIC_CLIENT_ID}
-                data-context="signin"
-                data-ux_mode="popup"
-                data-callback="google_response"
-              />
-              <div className="g_id_signin" data-type="standard"></div>
-            </div>
+            {/* Google Sign-in Button */}
+            <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
+            <div id="google-signin-btn" className="flex justify-center"></div>
 
-            <div className="flex  justify-center items-center gap-2 text-sm mt-6 text-gray-300">
+            {/* Navigation Links */}
+            <div className="flex justify-center items-center gap-2 text-sm mt-6 text-gray-300">
               <p>
                 {type === "login"
                   ? "Don’t have an account?"
@@ -191,6 +192,8 @@ export default function AuthForm({ type }) {
                 {type === "login" ? "Sign Up" : "Login"}
               </Link>
             </div>
+
+            {/* Creator Access Links */}
             <div className="text-center mt-6">
               <p className="text-sm text-gray-300 mb-2">Creator Access:</p>
               <div className="flex justify-center gap-4">
@@ -209,6 +212,7 @@ export default function AuthForm({ type }) {
               </div>
             </div>
 
+            {/* Reset Password */}
             {type === "login" && (
               <button
                 className="mt-6 w-full bg-white/10 text-white border border-white/20 rounded-lg py-3 hover:bg-white/20 transition"
@@ -219,7 +223,7 @@ export default function AuthForm({ type }) {
             )}
           </div>
         </div>
-      ) : null}
+      )}
     </>
   );
 }

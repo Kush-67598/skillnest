@@ -13,6 +13,8 @@ export default function CreatorLogin() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Google callback
   useEffect(() => {
     window.google_response = async (response) => {
       try {
@@ -24,7 +26,7 @@ export default function CreatorLogin() {
             type: "creator",
           }),
         });
-        
+
         const data = await res.json();
 
         if (data.success) {
@@ -36,7 +38,7 @@ export default function CreatorLogin() {
           });
           router.push("/Creator/panel/View");
         } else {
-          toast.error(data.error || "Google signup failed", {
+          toast.error(data.error || "Google login failed", {
             autoClose: 1500,
             pauseOnHover: false,
             hideProgressBar: true,
@@ -51,6 +53,28 @@ export default function CreatorLogin() {
       }
     };
   }, []);
+
+  // Render Google button immediately
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (
+        window.google?.accounts?.id &&
+        document.getElementById("google-signin-btn")
+      ) {
+        window.google.accounts.id.initialize({
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+          callback: window.google_response,
+        });
+        window.google.accounts.id.renderButton(
+          document.getElementById("google-signin-btn"),
+          { theme: "outline", size: "large", width: 250 }
+        );
+        clearInterval(interval);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -94,8 +118,8 @@ export default function CreatorLogin() {
     <>
       <ToastContainer position="top-right" theme="dark" />
 
-      <div className="-mt-30 min-h-screen flex items-center justify-center bg-gradient-to-br  px-4">
-        <div className="w-full max-w-5xl bg-gradient-to-br  to-indigo-800/80 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 text-white">
+      <div className="-mt-30 min-h-screen flex items-center justify-center bg-gradient-to-br px-4">
+        <div className="w-full max-w-5xl bg-gradient-to-br to-indigo-800/80 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 text-white">
           <h2 className="text-3xl font-bold text-center mb-4">Creator Login</h2>
           <p className="text-gray-300 text-center mb-6">
             Log in to your Creator account.
@@ -148,18 +172,11 @@ export default function CreatorLogin() {
             <div className="flex-1 h-px bg-white/20"></div>
           </div>
 
-          <div className="flex justify-center">
-            <Script src="https://accounts.google.com/gsi/client" async defer />
-            <div
-              id="g_id_onload"
-              data-client_id={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
-              data-context="signup"
-              data-ux_mode="popup"
-              data-callback="google_response"
-            />
-            <div className="g_id_signin" data-type="standard"></div>
-          </div>
+          {/* Google Sign-in Button */}
+          <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
+          <div id="google-signin-btn" className="flex justify-center"></div>
 
+          {/* Navigation Links */}
           <div className="flex flex-col justify-center items-center gap-4 mt-6 text-sm text-gray-300">
             <p>
               New Creator account?{" "}
