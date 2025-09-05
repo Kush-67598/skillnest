@@ -92,7 +92,9 @@ export default function CreatorMyCourses() {
         <p className="text-2xl mb-4">No courses found!</p>
         <button
           className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded text-white"
-          onClick={() => router.push("/Creator/panel/Edit")}
+          onClick={() => {
+            router.push("/Creator/panel/Edit");
+          }}
         >
           Create Your First Course
         </button>

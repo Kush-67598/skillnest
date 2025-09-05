@@ -7,9 +7,11 @@ import Script from "next/script";
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loader from "./Loader/loader";
 
 export default function AuthForm({ type }) {
   const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -53,7 +55,10 @@ export default function AuthForm({ type }) {
   // Render Google button immediately
   useEffect(() => {
     const interval = setInterval(() => {
-      if (window.google?.accounts?.id && document.getElementById("google-signin-btn")) {
+      if (
+        window.google?.accounts?.id &&
+        document.getElementById("google-signin-btn")
+      ) {
         window.google.accounts.id.initialize({
           client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
           callback: window.google_response,
@@ -70,6 +75,7 @@ export default function AuthForm({ type }) {
 
   const formSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const endpoint =
         type === "login"
@@ -102,11 +108,14 @@ export default function AuthForm({ type }) {
       }
     } catch (err) {
       toast.error("Internal Server Error", { autoClose: 1200 });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
+      {loading && <Loader />}
       <ToastContainer position="top-right" theme="dark" />
 
       {!token && (
@@ -175,7 +184,10 @@ export default function AuthForm({ type }) {
             </div>
 
             {/* Google Sign-in Button */}
-            <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
+            <Script
+              src="https://accounts.google.com/gsi/client"
+              strategy="afterInteractive"
+            />
             <div id="google-signin-btn" className="flex justify-center"></div>
 
             {/* Navigation Links */}

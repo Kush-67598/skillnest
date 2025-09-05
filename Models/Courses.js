@@ -31,7 +31,7 @@ const CoursesSchema = new mongoose.Schema({
   title: { type: String, required: true },
   price: { type: Number, required: true },
   category: { type: String, required: true },
-  creator: { type: mongoose.Schema.Types.ObjectId, ref: "Creator" },
+  creator: { type: mongoose.Schema.Types.ObjectId, ref: "Creator",required: true },
   description: { type: String, required: true },
   thumbnailURL: { type: String },
   chapters: [ChapterSchema],
@@ -39,4 +39,3 @@ const CoursesSchema = new mongoose.Schema({
 
 export default mongoose.models.Course ||
   mongoose.model("Course", CoursesSchema);
-mongoose.models = {};

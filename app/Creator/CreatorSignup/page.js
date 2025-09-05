@@ -6,9 +6,11 @@ import { ToastContainer, toast } from "react-toastify";
 import Script from "next/script";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
+import Loader from "@/Components/Loader/loader";
 
 export default function CreatorSignup() {
   const router = useRouter();
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,6 +21,7 @@ export default function CreatorSignup() {
   useEffect(() => {
     window.google_response = async (response) => {
       try {
+        setGoogleLoading(true);
         const res = await fetch("/api/Auth/Google", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -51,6 +54,8 @@ export default function CreatorSignup() {
           pauseOnHover: false,
           hideProgressBar: true,
         });
+      } finally {
+        setGoogleLoading(false);
       }
     };
   }, []);
@@ -68,7 +73,7 @@ export default function CreatorSignup() {
         });
         window.google.accounts.id.renderButton(
           document.getElementById("google-signin-btn"),
-          { theme: "outline", size: "large", width: 250 }
+          { theme: "filled_black", shape: "pill", size: "large", width: 250 }
         );
         clearInterval(interval);
       }
@@ -87,7 +92,6 @@ export default function CreatorSignup() {
         body: JSON.stringify({ name, email, password }),
       });
       const res = await signupCreator.json();
-      setLoading(false);
 
       if (res.success) {
         toast.success("Account Created Successfully", {
@@ -116,11 +120,14 @@ export default function CreatorSignup() {
         pauseOnHover: false,
         hideProgressBar: true,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
+      {googleLoading && <Loader />}
       <ToastContainer position="top-right" theme="dark" />
       <div className="-mt-15 max-h-screen flex items-center justify-center bg-gradient-to-br px-4">
         <div className="w-full max-w-5xl  bg-gradient-to-br via-indigo-900/90 to-purple-800/90 backdrop-blur-2xl border border-white/20 rounded-3xl p-10 md:p-12 text-white relative">

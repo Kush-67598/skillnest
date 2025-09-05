@@ -5,11 +5,12 @@ const CreatorSchema = new mongoose.Schema({
   password: {
     type: String,
     required: function () {
-      return !this.googleId; // password only required if not using Google OAuth
+      return !this.googleId;
     },
   },
   googleId: { type: String }, // <-- add this
   courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
 });
 
-export default mongoose.models.Creator || mongoose.model("Creator", CreatorSchema);
+export default mongoose.models.Creator ||
+  mongoose.model("Creator", CreatorSchema);

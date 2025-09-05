@@ -109,12 +109,13 @@ export default function CourseCard({ course }) {
           <h2 className="text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-500 drop-shadow-lg">
             {course.title}
           </h2>
+          {console.log(course)}
 
           {/* Creator */}
           <h3 className="text-gray-300 font-medium">
             By:{" "}
             <span className="text-indigo-400 font-semibold">
-              {course.creator.creatorName}
+              {course.creator?.creatorName || "Unknown Creator"}{" "}
             </span>
           </h3>
 

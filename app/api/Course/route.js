@@ -44,8 +44,7 @@ export async function GET(req) {
   const allCourses = await Courses.find()
     .populate("creator", "creatorName")
     .skip(skip)
-    .limit(limit)
-    .lean(); // only return name and email
+    .limit(limit);
 
   if (!allCourses) return NextResponse.json({ error: "No Courses Found" });
   return NextResponse.json({ allCourses: allCourses });
