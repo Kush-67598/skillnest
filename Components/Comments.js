@@ -194,29 +194,29 @@ export default function CommentsPage({ course }) {
   };
 
   return (
-    <div className="bg-gray-800 my-6 rounded-2xl p-6 text-white">
+    <div className="bg-gray-800 w-full my-6 rounded-2xl p-6 text-white">
       <h1 className="text-3xl font-bold mb-4">Comments</h1>
 
       {/* Top-level comment */}
-      <div className="flex justify-center mb-6 space-x-2">
-        <div className="flex flex-col items-center justify-center my-4">
+      <div className="flex justify-center mb-6">
+        <div className="flex flex-col w-full max-w-2xl my-4">
           {/* Username auto-filled from API */}
           <input
             type="text"
             value={author}
             readOnly
-            className="p-2 lg:w-[90vw] w-[20rem] rounded-md my-3 bg-gray-700 text-white placeholder-gray-400"
+            className="p-2 w-full rounded-md my-3 bg-gray-700 text-white placeholder-gray-400"
           />
           <textarea
             rows={5}
             placeholder="Write a comment..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            className="p-2 lg:w-[90vw] w-[20rem] rounded-md bg-gray-700 text-white placeholder-gray-400"
+            className="p-2 w-full rounded-md bg-gray-700 text-white placeholder-gray-400"
           />
           <button
             onClick={() => postComment()}
-            className="bg-purple-500 px-4 py-2 my-4 rounded-md hover:bg-purple-600"
+            className="bg-purple-500 px-4 py-2 my-4 rounded-md hover:bg-purple-600 self-end"
           >
             Post
           </button>
