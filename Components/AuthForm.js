@@ -65,7 +65,7 @@ export default function AuthForm({ type }) {
         });
         window.google.accounts.id.renderButton(
           document.getElementById("google-signin-btn"),
-          { theme: "outline", size: "large", width: 250 }
+          { theme: "filled_black", shape: "pill", size: "large", width: 250 }
         );
         clearInterval(interval);
       }

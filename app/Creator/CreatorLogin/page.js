@@ -67,7 +67,7 @@ export default function CreatorLogin() {
         });
         window.google.accounts.id.renderButton(
           document.getElementById("google-signin-btn"),
-          { theme: "outline", size: "large", width: 250 }
+          { theme: "filled_black", shape: "pill", size: "large", width: 250 }
         );
         clearInterval(interval);
       }
@@ -173,7 +173,10 @@ export default function CreatorLogin() {
           </div>
 
           {/* Google Sign-in Button */}
-          <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
+          <Script
+            src="https://accounts.google.com/gsi/client"
+            strategy="afterInteractive"
+          />
           <div id="google-signin-btn" className="flex justify-center"></div>
 
           {/* Navigation Links */}
