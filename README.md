@@ -187,5 +187,4 @@ Here is the correct format for GitHub, which will render as a code block and mai
 | `DELETE` | `/api/Course/:id/chapters/:chapterId/subchapters/:subId/lessons/:lessonId` | Delete lesson   |
 | `POST` | `/api/payments/`                                               | Razorpay Integration    |
 | `POST` | `/api/payments/webhooks`                                       | Razorpay Webhooks       |
-| `POST` | `/api/signup`                                                  | User/creator signup     |
-| `POST` | `/api/login`                                                   | User/creator login      |
+
