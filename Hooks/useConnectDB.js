@@ -9,7 +9,7 @@ export async function ConnectDB() {
 
   try {
     await mongoose.connect(
-      process.env.MONGO_URI,
+      "mongodb+srv://kushsingh2666:qWeRtY67598@skillnest-cluster.pd51hs8.mongodb.net/",
       {
         dbName: "SKILLNEST",
         bufferCommands: false,
