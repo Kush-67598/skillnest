@@ -12,7 +12,7 @@ export async function ConnectDB() {
       "mongodb+srv://kushsingh2666:qWeRtY67598@skillnest-cluster.pd51hs8.mongodb.net/",
       {
         dbName: "SKILLNEST",
-        bufferCommands: false,
+        // bufferCommands: false,
       }
     );
 
