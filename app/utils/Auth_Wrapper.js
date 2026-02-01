@@ -24,14 +24,14 @@ export default function AuthWrapper({ children }) {
 
     // Determine if current path is a creator route
     const isCreatorRoute = pathname.startsWith("/Creator");
-    if (!userToken && !creatorToken && !publicRoutes.includes(pathname)) {
-      router.push(isCreatorRoute ? "/Creator/CreatorLogin" : "/auth/signup");
-      toast.warning("Unauthorized.Please Login First", {
-        hideProgressBar: true,
-        pauseOnHover: false,
-        autoClose: 1000,
-      });
-    }
+    // if (!userToken && !creatorToken && !publicRoutes.includes(pathname)) {
+    //   router.push(isCreatorRoute ? "/Creator/CreatorLogin" : "/auth/signup");
+    //   toast.warning("Unauthorized.Please Login First", {
+    //     hideProgressBar: true,
+    //     pauseOnHover: false,
+    //     autoClose: 1000,
+    //   });
+    // }
   }, [router, pathname]);
 
   return <>{children}</>;

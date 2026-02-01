@@ -30,7 +30,7 @@ export default function AllLessonsPage({
       setCompleted(data.progress || {});
       // toast.success({pauseOnHover:false,autoClose:1000},"Progress loaded successfully!");
     } catch (err) {
-      toast.error(err.message || "Failed to load progress");
+      // toast.error(err.message || "Failed to load progress");
     } finally {
       setLoading(false);
     }
@@ -147,7 +147,7 @@ export default function AllLessonsPage({
                       `/Course/${courseId}/chapters/${chapterId}/subchapters/${subchapterId}/lessons/${lesson._id}`
                     );
                   } catch (err) {
-                    toast.error(err.message || "Failed to track progress");
+                    // toast.error(err.message || "Failed to track progress");
                     setLoading(false);
                   }
                 }}

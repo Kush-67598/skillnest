@@ -37,7 +37,7 @@ export default function SubchapterPage({ subChapters, courseId, chapterId }) {
       setLessonsCount(counts);
       // toast.success({pauseOnHover:false,autoClose:1000},"Progress loaded successfully!");
     } catch (err) {
-      toast.error(err.message || "Failed to load progress");
+      // toast.error(err.message || "Failed to load progress");
     } finally {
       setLoading(false);
     }
@@ -61,7 +61,7 @@ export default function SubchapterPage({ subChapters, courseId, chapterId }) {
         autoClose: 1000,
       });
     } catch (err) {
-      toast.error(err.message || "Failed to mark subchapter completed");
+      // toast.error(err.message || "Failed to mark subchapter completed");
     } finally {
       setLoading(false);
     }
@@ -149,7 +149,7 @@ export default function SubchapterPage({ subChapters, courseId, chapterId }) {
                       `/Course/${courseId}/chapters/${chapterId}/subchapters/${sub._id}/lessons`
                     );
                   } catch (err) {
-                    toast.error(err.message || "Failed to track progress");
+                    // toast.error(err.message || "Failed to track progress");
                     setLoading(false)
                   } 
                 }}

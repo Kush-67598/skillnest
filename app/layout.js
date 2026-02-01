@@ -27,7 +27,7 @@ export const metadata = {
     "AI summaries",
     "education platform",
   ],
-  authors: [{ name: "Kush Singh", url: "https://github.com/yourusername" }],
+  authors: [{ name: "Kush Singh", url: "https://github.com/Kush-67598" }],
   openGraph: {
       title: "SkillNest – Empowering Creators, Educating Users",
     description: "Creators can post courses and sell them, users can purchase and access content securely. Powered by Razorpay, AI summaries, and Cloudinary uploads.",
@@ -60,7 +60,7 @@ export default function RootLayout({ children }) {
           className={`${michroma.className} bg-black min-h-screen flex flex-col`}
         >
           <AuthWrapper>
-          <Navbar />
+          {/* <Navbar /> */}
           <main className="flex-1">{children}</main>
           <ToastContainer />
           <Footer />

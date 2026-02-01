@@ -13,7 +13,7 @@ export default function ChaptersPage({ chapters, courseId }) {
 
   // state
   const [course, setCourse] = useState(null);
-  const [authorized, setAuthorized] = useState(false);
+  const [authorized, setAuthorized] = useState(true);
   const [completed, setCompleted] = useState([]);
   const [subchapterCounts, setSubchapterCounts] = useState({});
   const [loading, setLoading] = useState(true);
@@ -23,9 +23,9 @@ export default function ChaptersPage({ chapters, courseId }) {
     try {
       const token = localStorage.getItem("USER_TOKEN");
       if (!token) {
-        toast.error("Please login to access this course");
-        router.replace("/auth/login");
-        return;
+        // toast.error("Please login to access this course");
+        // router.replace("/auth/login");
+        // return;
       }
 
       const resp = await fetch(`/api/Course/${courseId}`, {
@@ -39,7 +39,7 @@ export default function ChaptersPage({ chapters, courseId }) {
 
       setCourse(data.reqCourse); // ✅ correct field
     } catch (err) {
-      toast.error(err.message || "Failed to load course");
+      // toast.error(err.message || "Failed to load course");
       router.replace("/Course");
     }
   };
@@ -51,15 +51,15 @@ export default function ChaptersPage({ chapters, courseId }) {
     try {
       const token = localStorage.getItem("USER_TOKEN");
       if (!token) {
-        toast.error("Please login to access this course");
-        router.replace("/auth/login");
+        // toast.error("Please login to access this course");
+        // router.replace("/auth/login");
         return;
       }
 
       // free course → allow directly
       if (course.price === 0) {
         setAuthorized(true);
-        return;
+        // return;
       }
 
       // paid course → check user
@@ -79,7 +79,7 @@ export default function ChaptersPage({ chapters, courseId }) {
         router.replace("/Course");
       }
     } catch (err) {
-      toast.error(err.message || "Failed to verify access");
+      // toast.error(err.message || "Failed to verify access");
       router.replace("/Course");
     } finally {
       setLoading(false);
@@ -118,7 +118,7 @@ export default function ChaptersPage({ chapters, courseId }) {
       });
       setSubchapterCounts(counts);
     } catch (err) {
-      toast.error(err.message || "Failed to load progress");
+      // toast.error(err.message || "Failed to load progress");
     } finally {
       setLoading(false);
     }
@@ -144,7 +144,7 @@ export default function ChaptersPage({ chapters, courseId }) {
         hideProgressBar: true,
       });
     } catch (err) {
-      toast.error(err.message || "Failed to mark chapter completed");
+      // toast.error(err.message || "Failed to mark chapter completed");
     } finally {
       setLoading(false);
     }
@@ -240,7 +240,7 @@ export default function ChaptersPage({ chapters, courseId }) {
                       `/Course/${courseId}/chapters/${chapter._id}/subchapters`
                     );
                   } catch (err) {
-                    toast.error(err.message || "Failed to track progress");
+                    // toast.error(err.message || "Failed to track progress");
                     setLoading(false);
                   }
                 }}

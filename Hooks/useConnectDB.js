@@ -9,16 +9,16 @@ export async function ConnectDB() {
 
   try {
     await mongoose.connect(
-      "mongodb+srv://kushsingh2666:qWeRtY67598@skillnest-cluster.pd51hs8.mongodb.net/",
+      process.env.MONGO_URI,
       {
         dbName: "SKILLNEST",
-        // bufferCommands: false,
+        bufferCommands: false,
       }
     );
 
     console.log("✅ Connected to Database");
   } catch (error) {
-    console.error("❌ MongoDB connetion error:", error);
+    console.error("❌ MongoDB connection error:", error);
     throw error;
   }
 }

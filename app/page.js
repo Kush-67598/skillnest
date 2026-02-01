@@ -34,9 +34,9 @@ export default function Home() {
   useEffect(() => {
     const token = localStorage.getItem("USER_TOKEN");
     if (!token) {
-      router.push("/auth/login");
+      // router.push("/auth/login");
     } else {
-      setToken(token);
+      // setToken(token);
     }
   }, []);
 
@@ -52,7 +52,7 @@ export default function Home() {
   const opacity = 1 - scroll / 700;
   const translateY = scroll / 140;
 
-  if (!token) return null;
+  // if (!token) return null;
 
   return (
     <div className="text-white">

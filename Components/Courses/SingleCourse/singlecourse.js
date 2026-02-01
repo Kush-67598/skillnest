@@ -55,7 +55,7 @@ export default function SingleCourseCard({ course }) {
           `/api/check-completed?courseId=${course._id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
         const data = await resp.json();
 
@@ -81,8 +81,9 @@ export default function SingleCourseCard({ course }) {
 
   const handleEnroll = async () => {
     if (!token) {
-      toast.warn("Please login to enroll in the course.");
-      return;
+      // toast.warn("Please login to enroll in the course.");
+      // return;
+      router.push(`/Course/${course._id}/chapters`);
     }
 
     setLoading(true);
@@ -119,7 +120,7 @@ export default function SingleCourseCard({ course }) {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ courseId: course._id }),
-          }
+          },
         );
         const res = await enrolledcourse.json();
         if (res.success) {
